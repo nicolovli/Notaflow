@@ -1,0 +1,24 @@
+{
+	"name": "Notatdelingsplattform DevContainer",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"dbaeumer.vscode-eslint",
+				"bradlc.vscode-tailwindcss",
+				"formulahendry.auto-rename-tag",
+				"dsznajder.es7-react-js-snippets",
+				"christian-kohler.path-intellisense",
+				"mikestead.dotenv",
+				"firebase.vscode-firebase",
+				"antfu.vite",
+				"usernamehw.errorlens"
+			]
+		}
+	},
+	"forwardPorts": [5173],
+	"postCreateCommand": "chmod +x .devcontainer/post-script.sh && .devcontainer/post-script.sh",
+	"remoteUser": "node"
+}
