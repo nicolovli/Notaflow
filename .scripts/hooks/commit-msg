@@ -1,0 +1,17 @@
+#!/bin/bash
+
+COMMIT_MSG_FILE=$1
+
+# Check if the commit message is empty or contains only comments/whitespace
+COMMIT_MSG=$(grep -v '^#' "$COMMIT_MSG_FILE" | tr -d '[:space:]')
+
+if [ -z "$COMMIT_MSG" ]; then
+    echo "Aborting commit due to empty commit message"
+    exit 1
+fi
+
+# Check if the message is just the template without modifications
+if grep -q "^<type>(#[0-9]\+)$" "$COMMIT_MSG_FILE"; then
+    echo "Aborting commit: Please add a commit message"
+    exit 1
+fi

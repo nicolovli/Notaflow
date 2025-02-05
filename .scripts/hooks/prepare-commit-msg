@@ -1,0 +1,20 @@
+#!/bin/bash
+
+COMMIT_MSG_FILE=$1
+COMMIT_SOURCE=$2
+SHA1=$3
+
+if [ -z "$COMMIT_SOURCE" ] || [ "$COMMIT_SOURCE" = "template" ]; then
+
+    BRANCH_NAME=$(git symbolic-ref --short HEAD)
+    
+    # Extract issue number from branch name
+    ISSUE_NUMBER=$(echo "$BRANCH_NAME" | grep -o '^[0-9]\+\|[^0-9][0-9]\+' | grep -o '[0-9]\+' | head -n1)
+    
+    if [ ! -z "$ISSUE_NUMBER" ]; then
+        TEMPLATE_PATH=$(git config commit.template)
+        TEMPLATE=$(cat "$TEMPLATE_PATH")
+        MODIFIED_TEMPLATE=$(echo "$TEMPLATE" | sed "s/(#)/(#$ISSUE_NUMBER)/g")
+        echo "$MODIFIED_TEMPLATE" > "$COMMIT_MSG_FILE"
+    fi
+fi
