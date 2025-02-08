@@ -1,35 +1,28 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Header } from "./components/Header";
+import { Routes, Route} from 'react-router-dom';
+import { DashboardPage } from './pages/DashboardPage';
+import { UserPage } from "./pages/UserPage";
 
-function App() {
-  const [count, setCount] = useState(0)
+/**
+ * Root component of the application.
+ * 
+ * ## Responsibilities:
+ * - **Routing**: Defines app routes using 'react-router-dom'.
+ * 
+ * Here we define the routes of the application and the components that will be rendered when the user navigates to them.
+ * Therefore use <Route path="/path" element={<Component />} /> to define a route.
+ */
 
+export const App = () => {
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Header />
+      <Routes>
+        {/* TODO change path / to login page? For now it is dashboardpage */}
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="/Dashboard" element={<DashboardPage />} />
+        <Route path="/user" element={<UserPage />} />
+      </Routes>
     </>
-  )
-}
-
-export default App
+  );
+};
