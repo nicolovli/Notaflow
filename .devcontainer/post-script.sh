@@ -1,13 +1,18 @@
 #!/bin/bash 
 echo "Post script running..."
 
-TARGET_DIR=/workspaces/notatdelingsplattform
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-git config --global --add safe.directory /workspace
+TARGET_DIR="$SCRIPT_DIR/.."
 
-if [ -f .scripts/install-hooks.sh ]; then 
-    chmod +x "$TARGET_DIR/.scripts/install-hooks.sh";
-    "$TARGET_DIR/.scripts/install-hooks.sh"; 
+git config --global --add safe.directory $TARGET_DIR
+
+HOOKS_FILE="$TARGET_DIR/.scripts/install-hooks.sh"
+if [ -f $HOOKS_FILE ]; then 
+    chmod +x $HOOKS_FILE;
+    $HOOKS_FILE; 
+else
+    echo "No file found $HOOKS_FILE";
 fi
 
 echo "Installing node modules" 
