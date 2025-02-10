@@ -19,6 +19,6 @@
 		}
 	},
 	"forwardPorts": [5173],
-	"postCreateCommand": "chmod +x .devcontainer/post-script.sh && .devcontainer/post-script.sh",
+	"postStartCommand": "chmod +x .devcontainer/post-script.sh && .devcontainer/post-script.sh",
 	"remoteUser": "node"
 }
