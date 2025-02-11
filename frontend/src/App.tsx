@@ -2,6 +2,7 @@ import { Header } from "./components/Header";
 import { Routes, Route} from 'react-router-dom';
 import { DashboardPage } from './pages/DashboardPage';
 import { UserPage } from "./pages/UserPage";
+import { LoginPage } from "./pages/LoginPage";
 
 /**
  * Root component of the application.
@@ -20,6 +21,7 @@ export const App = () => {
       <Routes>
         {/* TODO change path / to login page? For now it is dashboardpage */}
         <Route path="/" element={<DashboardPage />} />
+        <Route path="/Login" element={<LoginPage />} />
         <Route path="/Dashboard" element={<DashboardPage />} />
         <Route path="/user" element={<UserPage />} />
       </Routes>
