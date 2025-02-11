@@ -1,7 +1,10 @@
+import { AuthLogin } from "../components/Login";
+
 export const LoginPage = () => {
-    return (
-        <div>
-            LoginPage here
-        </div>
-    );
+  return (
+    <div>
+      <AuthLogin />
+    </div>
+  );
 };
+

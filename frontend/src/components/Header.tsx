@@ -1,11 +1,20 @@
-import Logo from '../assets/Logo/NotaFlowLogo.svg';
-import Icon from '../assets/Icon/UserIcon.svg';
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import Logo from "../assets/Logo/NotaFlowLogo.svg";
+import Icon from "../assets/Icon/UserIcon.svg";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { AuthLogout } from "./logout";
 import Button from '@mui/material/Button';
 
 
-const Dropdown = ({ isOpen, navigate, onLogout }: { isOpen: boolean; navigate: (path: string) => void; onLogout: () => void }) => {
+const Dropdown = ({
+  isOpen,
+  navigate,
+  onLogout,
+}: {
+  isOpen: boolean;
+  navigate: (path: string) => void;
+  onLogout: () => void;
+}) => {
   if (!isOpen) return null;
 
   return (
@@ -14,7 +23,9 @@ const Dropdown = ({ isOpen, navigate, onLogout }: { isOpen: boolean; navigate: (
         <li className="px-4 py-2 hover:bg-indigo-100 cursor-pointer rounded-lg h-20 flex items-center justify-center" onClick={() => navigate('/user')}>
           Min konto
         </li>
-        <li className="px-4 py-2 hover:bg-indigo-100 cursor-pointer rounded-lg h-20 flex items-center justify-center" onClick={onLogout}>
+        <li
+          className="px-4 py-2 hover:bg-indigo-100 cursor-pointer rounded-lg h-20 flex items-center justify-center"
+          onClick={onLogout}>
           Logg ut
         </li>
       </ul>
@@ -22,10 +33,14 @@ const Dropdown = ({ isOpen, navigate, onLogout }: { isOpen: boolean; navigate: (
   );
 };
 
-
 export const Header = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleLogout = () => {
+    AuthLogout();
+    navigate("/");
+  };
 
   return (
     <div className="relative border-b-[1.5px] h-23 border-b-indigo-400 bg-indigo-500 flex items-center justify-center">
@@ -47,9 +62,9 @@ export const Header = () => {
               onMouseLeave={() => setIsOpen(false)}>
               <img src={Icon} alt="user icon" className='h-12 w-12 cursor-pointer' />
               {/* TODO: Add logout page */}
-              <Dropdown isOpen={isOpen} navigate={navigate} onLogout={() => navigate('/')} />
+              <Dropdown isOpen={isOpen} navigate={navigate} onLogout={handleLogout} />
           </div>
         </div>
     </div>
   );
-}
+};
