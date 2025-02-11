@@ -50,7 +50,7 @@ export const Header = () => {
         {/* Clickable logo, which takes you back to dashboard */}
         <div className='absolute left-10' onClick={() => navigate('/Dashboard')}>
             <img src={Logo} alt="Logo" className="h-15 w-15 cursor-pointer" />
-        </div>
+        </div>            
         {/* Log in button */}
         <div className='absolute flex items-center right-10'>
           <div>
@@ -59,7 +59,8 @@ export const Header = () => {
           {/* Clickable usericon, with a dropdown menu */}
           <div
               onMouseEnter={() => setIsOpen(true)}
-              onMouseLeave={() => setIsOpen(false)}>
+              onMouseLeave={() => setIsOpen(false)}
+              style={{ zIndex: 1000 }}>
               <img src={Icon} alt="user icon" className='h-12 w-12 cursor-pointer' />
               {/* TODO: Add logout page */}
               <Dropdown isOpen={isOpen} navigate={navigate} onLogout={handleLogout} />
