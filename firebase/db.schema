@@ -1,0 +1,14 @@
+/notes/{noteId}
+{
+  id: string,
+  user_id: string,
+  subject_id: string,
+  title: string,
+  content: string,
+  date: timestamp,
+  access_policy: {
+    type: "private" | "group" | "public",
+    allowed_users?: string[],
+    allowed_groups?: string[]
+  }
+}

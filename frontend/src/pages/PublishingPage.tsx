@@ -1,7 +1,10 @@
+import TextEditor from "../components/TextEditor";
+
+
 const PublishingPage = () => {
     return (
         <div>
-            PublishingPage here
+            <TextEditor />
         </div>
     );
 }

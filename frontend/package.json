@@ -16,9 +16,12 @@
     "@tailwindcss/vite": "^4.0.4",
     "firebase": "^11.3.0",
     "frontend": "file:",
+    "quill": "^2.0.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-quill-new": "^3.3.3",
     "react-router-dom": "^7.1.5",
+    "react-select": "^5.10.0",
     "tailwindcss": "^4.0.4"
   },
   "devDependencies": {
