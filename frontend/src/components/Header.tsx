@@ -50,11 +50,21 @@ export const Header = () => {
         {/* Clickable logo, which takes you back to dashboard */}
         <div className='absolute left-10' onClick={() => navigate('/Dashboard')}>
             <img src={Logo} alt="Logo" className="h-15 w-15 cursor-pointer" />
-        </div>            
+        </div>
+      {/* Clickable plus button */}
+      <div className="absolute right-60 z-20">
+        <button
+          className="h-8 w-8 border-2 border-black text-black bg-transparent text-3xl rounded-lg flex items-center justify-center hover:bg-indigo-900 transition cursor-pointer"
+          onClick={() => navigate('/PublishingPage')}
+        >
+          +
+        </button>
+      </div>
+                
         {/* Log in button */}
         <div className='absolute flex items-center right-10'>
           <div>
-            <Button sx={{marginRight: '40px'}} variant="contained" color='success' size='large' onClick={() => navigate('/Login')}>Logg inn</Button>
+            <Button sx={{marginRight: '20px'}} variant="contained" color='success' size='large' onClick={() => navigate('/Login')}>Logg inn</Button>
           </div>
           {/* Clickable usericon, with a dropdown menu */}
           <div

@@ -1,6 +1,7 @@
 import { Header } from "./components/Header";
 import { Routes, Route} from 'react-router-dom';
 import { DashboardPage } from './pages/DashboardPage';
+import  PublishingPage  from "./pages/PublishingPage";
 import { CourseDetailPage } from "./pages/CourseDetailPage";
 import { RegistrationPage } from "./pages/RegistrationPage";
 // import { UserPage } from "./pages/UserPage";
@@ -25,6 +26,7 @@ export const App = () => {
         <Route path="/" element={<DashboardPage />} />
         <Route path="/Login" element={<LoginPage />} />
         <Route path="/Dashboard" element={<DashboardPage />} />
+        <Route path="/PublishingPage" element={<PublishingPage />} />
         <Route path="/course/:id" element={<CourseDetailPage />} />
         <Route path="/user" element={<RegistrationPage />} />
       </Routes>
