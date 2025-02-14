@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import { App } from './App.tsx'
 import { BrowserRouter } from 'react-router-dom'
+import { AuthProvider } from './components/AuthContext.tsx'
 
 /**
  * Entry point of the React application.
@@ -26,7 +27,9 @@ const root = createRoot(container);
 root.render(
   <StrictMode>
     <BrowserRouter>
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </BrowserRouter>
   </StrictMode>
 )

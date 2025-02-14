@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { AuthLogout } from "./logout";
 import Button from '@mui/material/Button';
-
+import { useAuth } from "../firebase/func/useAuth";
 
 const Dropdown = ({
   isOpen,
@@ -36,6 +36,7 @@ const Dropdown = ({
 export const Header = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const { isLoggedIn } = useAuth();
 
   const handleLogout = () => {
     AuthLogout();
@@ -52,30 +53,34 @@ export const Header = () => {
             <img src={Logo} alt="Logo" className="h-15 w-15 cursor-pointer" />
         </div>
       {/* Clickable plus button */}
-      <div className="absolute right-60 z-20">
-        <button
-          className="h-8 w-8 border-2 border-black text-black bg-transparent text-3xl rounded-lg flex items-center justify-center hover:bg-indigo-900 transition cursor-pointer"
-          onClick={() => navigate('/PublishingPage')}
-        >
-          +
-        </button>
-      </div>
+      {isLoggedIn && (
+        <div className="absolute right-60 z-20">
+          <button
+            className="h-8 w-8 border-2 border-black text-black bg-transparent text-3xl rounded-lg flex items-center justify-center hover:bg-indigo-900 transition cursor-pointer"
+            onClick={() => navigate('/PublishingPage')}
+          >
+            +
+          </button>
+        </div>
+      )}
                 
-        {/* Log in button */}
-        <div className='absolute flex items-center right-10'>
+      {/* Log in button */}
+      <div className='absolute flex items-center right-10'>
+        {!isLoggedIn ? (
           <div>
             <Button sx={{marginRight: '20px'}} variant="contained" color='success' size='large' onClick={() => navigate('/Login')}>Logg inn</Button>
           </div>
-          {/* Clickable usericon, with a dropdown menu */}
+        ) : (
           <div
               onMouseEnter={() => setIsOpen(true)}
               onMouseLeave={() => setIsOpen(false)}
-              style={{ zIndex: 1000 }}>
-              <img src={Icon} alt="user icon" className='h-12 w-12 cursor-pointer' />
-              {/* TODO: Add logout page */}
-              <Dropdown isOpen={isOpen} navigate={navigate} onLogout={handleLogout} />
+              style={{ zIndex: 1000 }}
+          >
+            <img src={Icon} alt="user icon" className='h-12 w-12 cursor-pointer' />
+            <Dropdown isOpen={isOpen} navigate={navigate} onLogout={handleLogout} />
           </div>
-        </div>
+        )}
+      </div>
     </div>
   );
 };
