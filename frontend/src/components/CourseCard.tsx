@@ -5,16 +5,11 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import { Link } from "react-router-dom";
+import { Subject } from "../firebase/interfaces/interface.subject";
 
-interface Course {
-  id: string;
-  name: string;
-  code: string;
-  description: string;
-}
 
 interface Props {
-  course: Course;
+  course: Subject;
 }
 
 const CourseCard: React.FC<Props> = ({ course }) => {
@@ -36,6 +31,7 @@ const CourseCard: React.FC<Props> = ({ course }) => {
           alignItems: "stretch",
           height: "100%",
         }}
+        state={{course}}
       >
         <CardContent>
           {/* Show each couse, example: "Statistikk (ISTT1003) with description" */}
@@ -43,7 +39,7 @@ const CourseCard: React.FC<Props> = ({ course }) => {
             {course.name}
           </Typography>
           <Typography variant="subtitle1" color="text.secondary">
-            {course.code}
+            {course.subject_code}
           </Typography>
           <Divider sx={{ my: 1 }} />
           <Typography variant="body2" color="text.secondary">
