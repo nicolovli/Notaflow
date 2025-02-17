@@ -45,7 +45,7 @@ export const Header = () => {
 
   return (
     <div className="relative border-b-[1.5px] h-23 border-b-indigo-400 bg-indigo-500 flex items-center justify-center">
-        <div className="text-5xl text-white">
+        <div className="text-5xl text-white cursor-pointer" onClick={() => navigate('/Dashboard')}>
             NOTAFLOW
         </div>
         {/* Clickable logo, which takes you back to dashboard */}
