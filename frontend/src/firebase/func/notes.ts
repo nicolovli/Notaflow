@@ -1,4 +1,4 @@
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "../../Config/firebase-config";
 import { AccessPolicyType, accessPolicyTypeToString, Note, CreateNoteInput } from "../interfaces/interface.notes";
 
@@ -25,4 +25,42 @@ export const createNote = async (input: CreateNoteInput): Promise<string> => {
     console.error("Error creating note:", error);
     throw error;
   }
+};
+
+export const getNotesBySubject = async (subject_id: string): Promise<Note[]> => {
+  try {
+    const notesRef = collection(db, "notes");
+    const q = query(notesRef, where("subject_id", "==", subject_id));
+    const querySnapshot = await getDocs(q);
+    
+    const notes: Note[] = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as Note[];
+    
+    return notes;
+  } catch (error) {
+    console.error("Error fetching notes:", error);
+    throw error;
+  }
+};
+
+
+export const getNote = async (id: string): Promise<Note> => {
+ try {
+      const noteRef = doc(db, "notes", id);
+      const noteSnap = await getDoc(noteRef);
+      
+      if (!noteSnap.exists()) {
+        throw new Error(`Subject with ID ${id} not found`);
+      }
+      
+      return {
+        id: noteSnap.id,
+        ...noteSnap.data()
+      } as Note;
+    } catch (error) {
+      console.error("Error fetching subject:", error);
+      throw error;
+    }
 };

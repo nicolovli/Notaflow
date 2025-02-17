@@ -4,6 +4,8 @@ import { DashboardPage } from './pages/DashboardPage';
 import  PublishingPage  from "./pages/PublishingPage";
 import { CourseDetailPage } from "./pages/CourseDetailPage";
 import { RegistrationPage } from "./pages/RegistrationPage";
+import NotePage from "./pages/NotePage";
+// import { UserPage } from "./pages/UserPage";
 import { LoginPage } from "./pages/LoginPage";
 import { UserPage } from "./pages/UserPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -31,6 +33,7 @@ export const App = () => {
         <Route path="/course/:id" element={<CourseDetailPage />} />
         <Route path="/user" element={<UserPage />} />
         <Route path="/Registration" element={<RegistrationPage />} />
+        <Route path="/notes/:id" element={<NotePage />}/>
       
         <Route element={<ProtectedRoute />}>
           <Route path="/PublishingPage" element={<PublishingPage />} />
