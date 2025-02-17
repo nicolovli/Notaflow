@@ -4,9 +4,10 @@ import { DashboardPage } from './pages/DashboardPage';
 import  PublishingPage  from "./pages/PublishingPage";
 import { CourseDetailPage } from "./pages/CourseDetailPage";
 import { RegistrationPage } from "./pages/RegistrationPage";
-// import { UserPage } from "./pages/UserPage";
 import { LoginPage } from "./pages/LoginPage";
+import { UserPage } from "./pages/UserPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+
 
 /**
  * Root component of the application.
@@ -28,11 +29,13 @@ export const App = () => {
         <Route path="/Login" element={<LoginPage />} />
         <Route path="/Dashboard" element={<DashboardPage />} />
         <Route path="/course/:id" element={<CourseDetailPage />} />
+        <Route path="/user" element={<UserPage />} />
         <Route path="/Registration" element={<RegistrationPage />} />
       
         <Route element={<ProtectedRoute />}>
           <Route path="/PublishingPage" element={<PublishingPage />} />
         </Route>
+
       </Routes>
     </>
   );
