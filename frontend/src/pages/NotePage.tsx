@@ -4,7 +4,7 @@ import { getNote } from "../firebase/func/notes";
 import { Note } from "../firebase/interfaces/interface.notes";
 import { getSubject } from "../firebase/func/subject";
 import { Subject } from "../firebase/interfaces/interface.subject";
-
+import "../assets/style.css";
 
 export const NotePage: React.FC = () => {
     const { id } = useParams(); 
@@ -12,9 +12,7 @@ export const NotePage: React.FC = () => {
     const [note, setNote] = useState<Note | null>(null);
     const [isLoading, setisLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
     const [subject, setSubject] = useState<Subject | null>(null);
-
     
     useEffect(() => {
       const fetchAll = async () => {
@@ -46,26 +44,18 @@ export const NotePage: React.FC = () => {
     if (isLoading) { 
         return <p>Loading note</p>
     } else if(error || note == null || subject == null) {
-        return <p>Error occured</p>
+        return "error"
     } else {
         console.log(note);
         return (
-            <div className="bg-white shadow-lg rounded-2xl p-6 mb-6 transition-all duration-200 hover:shadow-xl m-20 w-full">
-            <div className="flex items-start justify-between">
-              <h2 className="text-xl font-semibold text-gray-900">{note.title}</h2>
+          <div className="flex justify-center items-start min-h-screen bg-white p-10">
+            <div className="max-w-3xl w-full bg-white rounded-lg p-8 font-sans">
+                <h1 className="text-4xl font-bold text-gray-900 mb-4">{note.title}</h1>
+                <p className="text-lg text-gray-700 font-medium border-b pb-4 mb-4">{subject.name} ({subject.subject_code})</p>
+                <br></br>
+                <div id="content" className="prose prose-lg text-gray-800 leading-relaxed" dangerouslySetInnerHTML={{ __html: note.content }} />
             </div>
-            
-            <div className="flex items-center mt-2 space-x-2">
-              <p className="text-sm text-gray-600">Fag: {subject.name} ({subject.subject_code})</p>
-            </div>
-      
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <div 
-                className="prose prose-sm max-w-none text-gray-700"
-                dangerouslySetInnerHTML={{ __html: note.content }}
-              />
-            </div>
-          </div>
+        </div>
         )
     }
 };
