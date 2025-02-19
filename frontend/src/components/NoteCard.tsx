@@ -21,6 +21,7 @@ const NoteCard: React.FC<Props> = ({ note }) => {
       const [userInfo, setUserInfo] = useState<AdditionalUserInfo | null>(null);
       const [isLoading, setIsLoading] = useState(true);
       const [error, setError] = useState<string | null>(null);
+      console.log(typeof note.date);
       
       useEffect(() => {
         const fetchUser = async () => {
@@ -65,6 +66,8 @@ const NoteCard: React.FC<Props> = ({ note }) => {
           <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
             {note.title}
           </Typography>
+          <Divider sx={{ my: 1 }} />
+       
           {(isLoading ? (<p>loading</p>) 
           : ( error ? (<p>Error loading user</p>) 
           : (
@@ -72,11 +75,11 @@ const NoteCard: React.FC<Props> = ({ note }) => {
             Laget av: {userInfo?.firstName} {userInfo?.lastName}
           </Typography>
           )))}
-         
-          <Divider sx={{ my: 1 }} />
-          <Typography variant="body2" color="text.secondary">
-            {note.content}
+          
+          <Typography variant="subtitle1" color="text.secondary">
+            Laget: {note.date.toDateString()}
           </Typography>
+       
         </CardContent>
       </CardActionArea>
     </Card>

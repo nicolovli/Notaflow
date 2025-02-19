@@ -13,6 +13,19 @@ interface Props {
 }
 
 const CourseCard: React.FC<Props> = ({ course }) => {
+  const truncateDescription = (text: string, maxLength: number = 180)  => {
+    if (text.length <= maxLength) return text;
+    
+    // Cut at maxLength and then find the last space before that point
+    const truncated = text.substr(0, maxLength);
+    const lastSpace = truncated.lastIndexOf(' ');
+    
+    // Return everything up to the last space plus ellipsis
+    return truncated.substr(0, lastSpace) + '...';
+  }
+
+  const courseDescription = truncateDescription(course.description);
+
   return (
     <Card
       sx={{
@@ -43,7 +56,7 @@ const CourseCard: React.FC<Props> = ({ course }) => {
           </Typography>
           <Divider sx={{ my: 1 }} />
           <Typography variant="body2" color="text.secondary">
-            {course.description}
+            {courseDescription}
           </Typography>
         </CardContent>
       </CardActionArea>

@@ -13,15 +13,16 @@ import { TextField, Alert } from "@mui/material";
  
 const FormComponent = () => {
   const [title, setTitle] = useState("");
-  const [option, setOption] = useState("");
+  const [option, setOption] = useState("public");
   const [text, setText] = useState("");
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
 
   //Error fields
   const [titleError, setTitleError] = useState<string | null>(null);
-  const [optionError, setOptionError] = useState<string | null>(null);
+  // const [optionError, setOptionError] = useState<string | null>(null);
   const [textError, setTextError] = useState<string | null>(null);
   const [selectedSubjectError, setSelectedSubjectError] = useState<string | null>(null);
+  const [resetKey, setResetKey] = useState<number>(0);
 
   // Success feedback state
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -37,7 +38,7 @@ const FormComponent = () => {
   const onSubmit = () => {
     console.log(selectedSubject)
     
-    setOptionError(null);
+    // setOptionError(null);
     setSelectedSubjectError(null);
     setTitleError(null);
     setTextError(null);
@@ -60,10 +61,10 @@ const FormComponent = () => {
       hasError = true;
     }
 
-    if (!option) {
-      setOptionError("Du må velge en tilgjengelighet");
-      hasError = true;
-    }
+    // if (!option) {
+    //   setOptionError("Du må velge en tilgjengelighet");
+    //   hasError = true;
+    // }
   
     //Don´t continoue if there is errors
     if (hasError) {
@@ -73,9 +74,10 @@ const FormComponent = () => {
     //Clear fields if no errors
     setSuccessMessage("Notatet har blitt publisert");
     setTitle("");
-    setOption("");
+    setOption("public");
     setText("");
     setSelectedSubject(null);
+    setResetKey(resetKey+1);
 
 
     //Create input
@@ -127,11 +129,11 @@ const FormComponent = () => {
 
           <div>
             <label style={{ display: "block", fontSize: "14px", fontWeight: "500", fontFamily: "sans-serif" }}>Fag</label>
-              <CourseSelector onSubjectSelect={handleSubjectSelect} />
+              <CourseSelector key={resetKey} onSubjectSelect={handleSubjectSelect} />
               {selectedSubjectError && <p style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>{selectedSubjectError}</p>}
           </div>
 
-          <div>
+          {/* <div>
             <label style={{ display: "block", fontSize: "14px", fontWeight: "500", fontFamily: "sans-serif" }}>Tilgjengelighet</label>
             <select
               value={option}
@@ -144,7 +146,7 @@ const FormComponent = () => {
               <option value="public">Offentlig</option>
             </select>
             {optionError && <p style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>{optionError}</p>}
-          </div>
+          </div> */}
 
           <div>
             <label style={{ display: "block", fontSize: "14px", fontWeight: "500" }}>Notat</label>

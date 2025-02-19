@@ -32,12 +32,14 @@ export const getNotesBySubject = async (subject_id: string): Promise<Note[]> => 
     const notesRef = collection(db, "notes");
     const q = query(notesRef, where("subject_id", "==", subject_id));
     const querySnapshot = await getDocs(q);
-    
-    const notes: Note[] = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    })) as Note[];
-    
+    const notes: Note[] = querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        date: data.date?.toDate() // Convert Timestamp to Date
+      };
+    }) as Note[];
     return notes;
   } catch (error) {
     console.error("Error fetching notes:", error);
@@ -45,22 +47,21 @@ export const getNotesBySubject = async (subject_id: string): Promise<Note[]> => 
   }
 };
 
-
 export const getNote = async (id: string): Promise<Note> => {
- try {
-      const noteRef = doc(db, "notes", id);
-      const noteSnap = await getDoc(noteRef);
-      
-      if (!noteSnap.exists()) {
-        throw new Error(`Subject with ID ${id} not found`);
-      }
-      
-      return {
-        id: noteSnap.id,
-        ...noteSnap.data()
-      } as Note;
-    } catch (error) {
-      console.error("Error fetching subject:", error);
-      throw error;
+  try {
+    const noteRef = doc(db, "notes", id);
+    const noteSnap = await getDoc(noteRef);
+    if (!noteSnap.exists()) {
+      throw new Error(`Subject with ID ${id} not found`);
     }
+    const data = noteSnap.data();
+    return {
+      id: noteSnap.id,
+      ...data,
+      date: data.date?.toDate() // Convert Timestamp to Date
+    } as Note;
+  } catch (error) {
+    console.error("Error fetching subject:", error);
+    throw error;
+  }
 };
