@@ -1,15 +1,17 @@
 import { Header } from "./components/Header";
-import { Routes, Route} from 'react-router-dom';
-import { DashboardPage } from './pages/DashboardPage';
-import  PublishingPage  from "./pages/PublishingPage";
+import { Routes, Route } from "react-router-dom";
+import { DashboardPage } from "./pages/DashboardPage";
+import PublishingPage from "./pages/PublishingPage";
 import { CourseDetailPage } from "./pages/CourseDetailPage";
 import { RegistrationPage } from "./pages/RegistrationPage";
 import NotePage from "./pages/NotePage";
-// import { UserPage } from "./pages/UserPage";
 import { LoginPage } from "./pages/LoginPage";
 import { UserPage } from "./pages/UserPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-
+import { MyNotesPage } from "./pages/MyNotesPage";
+import { FavoriteNotesPage } from "./pages/FavoriteNotesPage";
+import NavigationDrawer from "./components/NavigationDrawer";
+import FloatingPlusButton from "./components/FloatingPlusButton";
 
 /**
  * Root component of the application.
@@ -23,23 +25,33 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 
 export const App = () => {
   return (
-    <>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateRows: "auto 1fr", // header = auto, main content fills the rest
+        minHeight: "100vh",
+      }}>
+      <FloatingPlusButton />
       <Header />
-      <Routes>
-        {/* TODO change path / to login page? For now it is dashboardpage */}
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/Login" element={<LoginPage />} />
-        <Route path="/Dashboard" element={<DashboardPage />} />
-        <Route path="/course/:id" element={<CourseDetailPage />} />
-        <Route path="/user" element={<UserPage />} />
-        <Route path="/Registration" element={<RegistrationPage />} />
-        <Route path="/notes/:id" element={<NotePage />}/>
-      
-        <Route element={<ProtectedRoute />}>
-          <Route path="/PublishingPage" element={<PublishingPage />} />
-        </Route>
-
-      </Routes>
-    </>
+      <div style={{ display: "flex" }}>
+        <NavigationDrawer />
+        <div style={{ flexGrow: 1, padding: "16px", overflow: "auto" }}>
+          <Routes>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/Login" element={<LoginPage />} />
+            <Route path="/Dashboard" element={<DashboardPage />} />
+            <Route path="/course/:id" element={<CourseDetailPage />} />
+            <Route path="/user" element={<UserPage />} />
+            <Route path="/Registration" element={<RegistrationPage />} />
+            <Route path="/notes/:id" element={<NotePage />} />
+            <Route path="/myNotes" element={<MyNotesPage />} />
+            <Route path="/myFavoriteNotes" element={<FavoriteNotesPage />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/PublishingPage" element={<PublishingPage />} />
+            </Route>
+          </Routes>
+        </div>
+      </div>
+    </div>
   );
 };
