@@ -1,4 +1,3 @@
-import Logo from "../assets/Logo/NotaFlowLogo.svg";
 import Icon from "../assets/Icon/UserIcon.svg";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -50,13 +49,9 @@ export const Header = () => {
   }, [isLoggedIn]);
 
   return (
-    <div className="relative border-b-[1.5px] h-17 border-b-indigo-400 bg-indigo-500 flex items-center justify-center">
-      <div className="text-5xl text-white cursor-pointer" onClick={() => navigate("/Dashboard")}>
+    <div className="relative border-b-[1.5px] h-17 border-b-gray-100 bg-[#19262d] flex items-center">
+      <div className="left-20 relative text-4xl text-white cursor-pointer" onClick={() => navigate("/Dashboard")}>
         NOTAFLOW
-      </div>
-      {/* Clickable logo, which takes you back to dashboard */}
-      <div className="absolute left-10" onClick={() => navigate("/Dashboard")}>
-        <img src={Logo} alt="Logo" className="h-15 w-15 cursor-pointer" />
       </div>
 
       {/* Log in button */}
