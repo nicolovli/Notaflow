@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import Card from "@mui/material/Card";
 import CardActionArea from "@mui/material/CardActionArea";
-import CardContent from "@mui/material/CardContent";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
+import { CircularProgress, Divider, Typography, CardContent } from '@mui/material';
 import { Link } from "react-router-dom";
 import { Note } from '../firebase/interfaces/interface.notes';
 import { getAdditionalUserData } from '../firebase/func/user';
-import { AdditionalUserInfo } from '../firebase/interfaces/interface.userInfo';
-import { CircularProgress } from '@mui/material';
+import { BasicUserInfo } from '../firebase/interfaces/interface.userInfo';
+
 
 
 interface Props {
@@ -16,16 +14,14 @@ interface Props {
 }
 
 const NoteCard: React.FC<Props> = ({ note }) => {
-      const [userInfo, setUserInfo] = useState<AdditionalUserInfo | null>(null);
+      const [userInfo, setUserInfo] = useState<BasicUserInfo | null>(null);
       const [isLoading, setIsLoading] = useState(true);
       const [error, setError] = useState<string | null>(null);
-      console.log(typeof note.date);
       
       useEffect(() => {
         const fetchUser = async () => {
           try {
               const _userInfo = await getAdditionalUserData(note.user_id);
-              console.log(_userInfo)
               setUserInfo(_userInfo);
             
           } catch (err) {
@@ -66,8 +62,10 @@ const NoteCard: React.FC<Props> = ({ note }) => {
           </Typography>
           <Divider sx={{ my: 1 }} />
        
-          {(isLoading ? (<CircularProgress size={22} />) 
-          : ( error ? (<p>Error loading user</p>) 
+          {(isLoading ? (<CircularProgress size={21.5} />) 
+          : ( error ? ( <Typography variant="subtitle1" color="text.secondary">
+            Error loading user
+          </Typography>) 
           : (
             <Typography variant="subtitle1" color="text.secondary">
             Laget av: {userInfo?.firstName} {userInfo?.lastName}

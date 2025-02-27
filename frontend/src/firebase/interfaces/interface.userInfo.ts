@@ -1,6 +1,6 @@
-export interface AdditionalUserInfo { 
+export interface BasicUserInfo { 
     id: string, 
     firstName: string, 
     lastName: string,
-    usernmae: string
+    username: string
 }
