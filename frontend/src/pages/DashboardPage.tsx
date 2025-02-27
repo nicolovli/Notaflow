@@ -1,7 +1,7 @@
 // src/pages/DashboardPage.tsx
 
 import React, { useState, useEffect } from "react";
-import { Box, Pagination } from "@mui/material";
+import { Box, CircularProgress, Pagination, Alert } from "@mui/material";
 import Grid from "@mui/material/Grid"; 
 import CourseCard from "../components/CourseCard";
 import { Subject } from "../firebase/interfaces/interface.subject";
@@ -72,11 +72,15 @@ export const DashboardPage: React.FC = () => {
     );
   } else if (isLoading == false && (subjects.length == 0 || error)) { 
     return (
-      <p>Error</p>
+      <Alert variant="filled" severity="error">
+        An error occured. Check you network connection
+      </Alert>
     )
   } else {
     return (
-      <p>Loading subjects....</p>
+      <div className="w-full h-full w flex justify-center items-center">
+        <CircularProgress />
+      </div>
     );
   }
   

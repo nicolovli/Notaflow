@@ -4,7 +4,9 @@ import { getNote } from "../firebase/func/notes";
 import { Note } from "../firebase/interfaces/interface.notes";
 import { getSubject } from "../firebase/func/subject";
 import { Subject } from "../firebase/interfaces/interface.subject";
+import { CircularProgress, Alert } from "@mui/material";
 import "../assets/style.css";
+
 
 export const NotePage: React.FC = () => {
     const { id } = useParams(); 
@@ -42,11 +44,14 @@ export const NotePage: React.FC = () => {
   
 
     if (isLoading) { 
-        return <p>Loading note</p>
+      <div className="flex justify-center items-start min-h-screen bg-white p-10">
+        <CircularProgress />
+        </div>
     } else if(error || note == null || subject == null) {
-        return "error"
+        return <Alert variant="filled" severity="error">
+                An error occured. Check you network connection
+              </Alert>
     } else {
-        console.log(note);
         return (
           <div className="flex justify-center items-start min-h-screen bg-white p-10">
             <div className="max-w-3xl w-full bg-white rounded-lg p-8 font-sans">
