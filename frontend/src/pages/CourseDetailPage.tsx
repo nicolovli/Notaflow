@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, CircularProgress, Alert } from "@mui/material";
 import Grid from "@mui/material/Grid"; 
 import { useParams, useLocation } from "react-router-dom";
 import { getNotesBySubject } from "../firebase/func/notes";
@@ -41,9 +41,15 @@ export const CourseDetailPage: React.FC = () => {
   
 
     if (isLoading) { 
-        return <p>Loading notes</p>
+        return (
+            <div className="w-full h-full w flex justify-center items-center">
+              <CircularProgress />
+            </div>
+        )
     } else if(error) {
-        return <p>Error occured</p>
+        return <Alert variant="filled" severity="error">
+                An error occured. Check you network connection
+              </Alert>
     } else {
         return (
             <div>

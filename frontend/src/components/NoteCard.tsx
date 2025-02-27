@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import { Note } from '../firebase/interfaces/interface.notes';
 import { getAdditionalUserData } from '../firebase/func/user';
 import { AdditionalUserInfo } from '../firebase/interfaces/interface.userInfo';
-
+import { CircularProgress } from '@mui/material';
 
 
 interface Props {
@@ -16,8 +16,6 @@ interface Props {
 }
 
 const NoteCard: React.FC<Props> = ({ note }) => {
-
-
       const [userInfo, setUserInfo] = useState<AdditionalUserInfo | null>(null);
       const [isLoading, setIsLoading] = useState(true);
       const [error, setError] = useState<string | null>(null);
@@ -68,7 +66,7 @@ const NoteCard: React.FC<Props> = ({ note }) => {
           </Typography>
           <Divider sx={{ my: 1 }} />
        
-          {(isLoading ? (<p>loading</p>) 
+          {(isLoading ? (<CircularProgress size={22} />) 
           : ( error ? (<p>Error loading user</p>) 
           : (
             <Typography variant="subtitle1" color="text.secondary">

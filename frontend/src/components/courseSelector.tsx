@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Subject } from '../firebase/interfaces/interface.subject'
 import { getAllSubjects } from '../firebase/func/subject'
+import { CircularProgress, Alert} from '@mui/material';
 
 interface CourseSelectorProps {
   onSubjectSelect: (subject: Subject | null) => void;
@@ -66,9 +67,11 @@ const CourseSelector: React.FC<CourseSelectorProps> = ({
       {isOpen && (
         <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
           {isLoading ? (
-            <div className="p-2 text-gray-500">Loading subjects...</div>
+            <CircularProgress />
           ) : error ? (
-            <div className="p-2 text-red-500">{error}</div>
+             <Alert variant="filled" severity="error">
+                    An error occured. Check you network connection
+              </Alert>
           ) : filteredSubjects.length === 0 ? (
             <div className="p-2 text-gray-500">No subjects found</div>
           ) : (
