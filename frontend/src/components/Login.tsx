@@ -20,7 +20,7 @@ export const AuthLogin: React.FC = () => {
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const signIn = async (): Promise<void> => {
-    console.log(auth?.currentUser?.email || "Ingen bruker er logget inn")
+    console.log(auth?.currentUser?.email || "Ingen bruker er logget inn");
 
     // Empty previous errors
     setEmailError(null);
@@ -30,8 +30,7 @@ export const AuthLogin: React.FC = () => {
       await signInWithEmailAndPassword(auth, email, password);
       console.log("Innlogging vellykket:", auth.currentUser?.email);
       navigate("/Dashboard");
-
-    } catch (error:unknown) {
+    } catch (error: unknown) {
       const err = error as FirebaseErrorLike;
       console.error("Feil ved innlogging:", err.message);
 
@@ -40,43 +39,59 @@ export const AuthLogin: React.FC = () => {
       } else if (err.code === "auth/missing-password") {
         setPasswordError("Fyll inn passord");
       } else if (err.code === "auth/invalid-credential") {
-        setPasswordError("Feil passord")
+        setPasswordError("Feil passord");
       } else {
         setEmailError("Noe gikk galt. Prøv igjen senere.");
       }
     }
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLFormElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      signIn();
+    }
+  };
+
   return (
     <div className="flex flex-col items-center">
-      <Box 
-        component="form" 
-        sx={{ display: "flex", 
-        flexDirection: "column", 
-        gap: 2, width: "300px", 
-        margin: "auto", 
-        marginTop: 5,
+      <Box
+        component="form"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          width: "300px",
+          margin: "auto",
+          marginTop: 5,
         }}
         padding="16px"
-      >
-      <TextField
-        required
-        error={!!emailError}
-        helperText={emailError || ""}
-        placeholder="Epost" 
-        type="email" 
-        onChange={(e) => setEmail(e.target.value)} 
-      />
-      <TextField
-        required
-        error={!!passwordError}
-        helperText={passwordError || ""}
-        placeholder="Password"
-        type="password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
-     </Box>
-      <Button sx={{margin: "10px", width: "150px"}} color="primary" variant="contained" onClick={signIn}> Logg inn</Button>
+        onKeyDown={handleKeyDown}>
+        <TextField
+          required
+          error={!!emailError}
+          helperText={emailError || ""}
+          placeholder="Epost"
+          type="email"
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <TextField
+          required
+          error={!!passwordError}
+          helperText={passwordError || ""}
+          placeholder="Password"
+          type="password"
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </Box>
+      <Button
+        sx={{ margin: "10px", width: "150px" }}
+        color="primary"
+        variant="contained"
+        onClick={signIn}>
+        {" "}
+        Logg inn
+      </Button>
     </div>
   );
 };

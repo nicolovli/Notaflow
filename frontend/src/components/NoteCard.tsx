@@ -86,7 +86,7 @@ const NoteCard: React.FC<Props> = ({ note }) => {
               zIndex: 10,
               backgroundColor: "rgba(255, 255, 255, 0)",
               "&:hover": {
-                backgroundColor: "rgba(255, 255, 255, 0)",
+                backgroundColor: "rgba(0, 0, 0, 0.1)",
               },
             }}>
             <MoreVertIcon />
