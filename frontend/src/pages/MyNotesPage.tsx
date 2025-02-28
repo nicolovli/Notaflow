@@ -15,6 +15,10 @@ export const MyNotesPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const handleDeleteNote = (noteId: string) => {
+    setNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteId));
+  };
+
   useEffect(() => {
     const fetchNotes = async () => {
       try {
@@ -68,7 +72,7 @@ export const MyNotesPage: React.FC = () => {
         <Grid container spacing={3}>
           {currentNotes.map((note) => (
             <Grid item xs={12} sm={6} md={4} lg={4} key={note.id}>
-              <NoteCard note={note} />
+              <NoteCard note={note} onDelete={handleDeleteNote} />
             </Grid>
           ))}
         </Grid>
