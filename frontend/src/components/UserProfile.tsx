@@ -21,7 +21,7 @@ const ProfilePage: React.FC = () => {
   const [updateSuccessMessage, setUpdateSuccessMessage] = useState<string>("");
   const [updateErrorMessage, setUpdateErrorMessage] = useState<string>("");
 
-  // Password update 
+  // Password update
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmNewPassword, setConfirmNewPassword] = useState<string>("");
   const [passwordUpdateSuccess, setPasswordUpdateSuccess] = useState<string>("");
@@ -111,20 +111,11 @@ const ProfilePage: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         Min profil
       </Typography>
-      <TextField
-        label="Fornavn"
-        value={firstName}
-        fullWidth
-        margin="normal"
-        disabled
-      />
-      <TextField
-        label="Etternavn"
-        value={lastName}
-        fullWidth
-        margin="normal"
-        disabled
-      />
+      <Typography variant="h6" gutterBottom>
+        Hei {username}!
+      </Typography>
+      <TextField label="Fornavn" value={firstName} fullWidth margin="normal" disabled />
+      <TextField label="Etternavn" value={lastName} fullWidth margin="normal" disabled />
       <TextField
         label="Brukernavn"
         value={username}
@@ -191,4 +182,4 @@ const ProfilePage: React.FC = () => {
   );
 };
 
-export default ProfilePage
+export default ProfilePage;
