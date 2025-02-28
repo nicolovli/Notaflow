@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, CircularProgress, Alert } from "@mui/material";
 import Grid from "@mui/material/Grid"; 
-import { useParams, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { getNotesBySubject } from "../firebase/func/notes";
 import { Note } from "../firebase/interfaces/interface.notes";
 import { Subject } from "../firebase/interfaces/interface.subject";
 import NoteCard from "../components/NoteCard";
+import { getSubject } from "../firebase/func/subject";
 
 export const CourseDetailPage: React.FC = () => {
     const { id } = useParams(); 
-    const location = useLocation();
-    const course: Subject = location.state?.course;
+    // const location = useLocation();
+    // const course: Subject = location.state?.course;
+    const [course, setCourse] = useState<Subject | null>(null);
 
-    if( id !== course.id) {
-        throw new Error("Invalid state");
-    }
+    // if( id !== course.id) {
+    //     throw new Error("Invalid state");
+    // }
     const [notes, setNotes] = useState<Note[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -25,8 +27,10 @@ export const CourseDetailPage: React.FC = () => {
           if (id == undefined) { 
             setError("ID not set correctly");  
           }
-          const notes = await getNotesBySubject((id ? id : ""));
-          setNotes(notes);
+          const courseData = await getSubject((id ? id : ""));  
+          setCourse(courseData);
+          const notesData = await getNotesBySubject((id ? id : ""));
+          setNotes(notesData);
           // sort
           
         } catch (err) {
@@ -50,6 +54,12 @@ export const CourseDetailPage: React.FC = () => {
         return <Alert variant="filled" severity="error">
                 An error occured. Check you network connection
               </Alert>
+    } else if(!course){
+      return(
+        <Alert variant="filled" severity="warning">
+          Course not found
+        </Alert>
+      )
     } else {
         return (
             <div>

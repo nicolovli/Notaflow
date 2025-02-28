@@ -1,9 +1,8 @@
-// src/pages/DashboardPage.tsx
-
 import React, { useState, useEffect } from "react";
 import { Box, CircularProgress, Pagination, Alert } from "@mui/material";
 import Grid from "@mui/material/Grid"; 
 import CourseCard from "../components/CourseCard";
+import SearchBar from "../components/SearchBar";
 import { Subject } from "../firebase/interfaces/interface.subject";
 import { getAllSubjects } from "../firebase/func/subject";
 
@@ -12,6 +11,7 @@ export const DashboardPage: React.FC = () => {
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [filteredSubjects, setFilteredSubjects] = useState<Subject[]>([]);
     
     useEffect(() => {
       const fetchSubjects = async () => {
@@ -20,6 +20,7 @@ export const DashboardPage: React.FC = () => {
           // sort
           const sortedCourses: Subject[] = [...courses].sort((a, b) => a.name.localeCompare(b.name));
           setSubjects(sortedCourses); 
+          setFilteredSubjects(sortedCourses);
         } catch (err) {
           setError(err instanceof Error ? err.message : 'Failed to fetch subjects');
         } finally {
@@ -30,18 +31,24 @@ export const DashboardPage: React.FC = () => {
       fetchSubjects();
     }, []);
 
+  //handle search term changes 
+  const handleSearch = (filteredSubjects: Subject[]) => {
+    setFilteredSubjects(filteredSubjects);
+    setPage(1); // Reset the page number to 1
+  };
+
   // Pagination state
   const [page, setPage] = useState(1);
   const coursesPerPage = 12;
 
-  if(isLoading == false && subjects.length > 0) { 
+  if(isLoading == false && filteredSubjects.length > 0) { 
     // Calculate indices for slicing the sorted array
     const indexOfLastCourse = page * coursesPerPage;
     const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
-    const currentCourses = subjects.slice(indexOfFirstCourse, indexOfLastCourse);
+    const currentCourses = filteredSubjects.slice(indexOfFirstCourse, indexOfLastCourse);
 
     // Calculate the total number of pages
-    const totalPages = Math.ceil(subjects.length / coursesPerPage);
+    const totalPages = Math.ceil(filteredSubjects.length / coursesPerPage);
 
     // Handle page changes
     const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
@@ -49,6 +56,7 @@ export const DashboardPage: React.FC = () => {
     };
     return (
       <Box sx={{ pt: 10, pr: 12, pb: 3, pl: 12 }}>
+        <SearchBar subjects={subjects} onSearch={handleSearch} />
         <Grid container spacing={3}>
           {currentCourses.map((course) => (
             <Grid item 
@@ -70,7 +78,7 @@ export const DashboardPage: React.FC = () => {
         </Box>
       </Box>
     );
-  } else if (isLoading == false && (subjects.length == 0 || error)) { 
+  } else if (isLoading == false && (filteredSubjects.length == 0 || error)) { 
     return (
       <Alert variant="filled" severity="error">
         An error occured. Check you network connection
