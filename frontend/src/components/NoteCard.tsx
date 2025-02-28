@@ -9,26 +9,41 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  Snackbar,
 } from "@mui/material";
+import Slide, { SlideProps } from "@mui/material/Slide";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import DialogActions from "@mui/material/DialogActions";
 import { Link } from "react-router-dom";
 import { Note } from "../firebase/interfaces/interface.notes";
 import { getAdditionalUserData } from "../firebase/func/user";
 import { BasicUserInfo } from "../firebase/interfaces/interface.userInfo";
 import { auth } from "../Config/firebase-config";
+import { deleteNote } from "../firebase/func/notes";
 
 interface Props {
   note: Note;
+  onDelete: (noteId: string) => void;
 }
 
-const NoteCard: React.FC<Props> = ({ note }) => {
+function SlideTransition(props: SlideProps) {
+  return <Slide {...props} direction="up" />;
+}
+
+const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
   const currentUser = auth.currentUser;
   const [userInfo, setUserInfo] = useState<BasicUserInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const [open, setOpen] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [deleted, setDeleted] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -44,7 +59,7 @@ const NoteCard: React.FC<Props> = ({ note }) => {
     };
 
     fetchUser();
-  }, [note]);
+  }, [note, deleted]);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation(); // Stopper klikket fra å trigge navigasjon
@@ -60,9 +75,19 @@ const NoteCard: React.FC<Props> = ({ note }) => {
     handleMenuClose();
   };
 
-  const handleDelete = () => {
-    // console.log("Delete note", note.id);
+  const handleDelete = async () => {
+    try {
+      await deleteNote(note.id);
+      setSnackbarOpen(true);
+      setDeleted(true);
+      setTimeout(() => {
+        onDelete(note.id);
+      }, 2000);
+    } catch (err) {
+      console.error("Failed to delete note:", err);
+    }
     handleMenuClose();
+    setOpen(false);
   };
 
   return (
@@ -94,11 +119,11 @@ const NoteCard: React.FC<Props> = ({ note }) => {
 
           <Menu
             anchorEl={anchorEl}
-            open={open}
+            open={Boolean(anchorEl)}
             onClose={handleMenuClose}
             onClick={(e) => e.stopPropagation()}>
-            <MenuItem onClick={handleEdit}>Edit</MenuItem>
-            <MenuItem onClick={handleDelete}>Delete</MenuItem>
+            <MenuItem onClick={handleEdit}>Rediger</MenuItem>
+            <MenuItem onClick={() => setOpen(true)}>Slett</MenuItem>
           </Menu>
         </>
       )}
@@ -135,6 +160,27 @@ const NoteCard: React.FC<Props> = ({ note }) => {
           </Typography>
         </CardContent>
       </CardActionArea>
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>Bekreft sletting</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Er du sikker på at du vil slette dette notatet?</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)}>Ikke slett</Button>
+          <Button onClick={handleDelete} autoFocus>
+            Slett
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        TransitionComponent={SlideTransition}
+        message="Ditt notat er nå blitt slettet!"
+      />
     </Card>
   );
 };

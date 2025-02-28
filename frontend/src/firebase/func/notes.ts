@@ -1,4 +1,13 @@
-import { collection, addDoc, query, where, getDocs, doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  query,
+  where,
+  getDocs,
+  doc,
+  getDoc,
+  deleteDoc,
+} from "firebase/firestore";
 import { db } from "../../Config/firebase-config";
 import {
   AccessPolicyType,
@@ -87,6 +96,17 @@ export const getUserNotes = async (user_id: string): Promise<Note[]> => {
     return notes;
   } catch (error) {
     console.error("Error fetching user notes:", error);
+    throw error;
+  }
+};
+
+export const deleteNote = async (note_id: string): Promise<void> => {
+  try {
+    const noteRef = doc(db, "notes", note_id);
+    await deleteDoc(noteRef);
+    console.log(`Note with ID ${note_id} has been successfully deleted.`); //fjern eventuelt
+  } catch (error) {
+    console.error("Error deleting note:", error);
     throw error;
   }
 };
