@@ -82,40 +82,62 @@ export const NotePage: React.FC = () => {
     );
   } else {
     return (
-      <div className="flex justify-center items-start min-h-screen bg-white p-10">
-        <div className="max-w-3xl w-full bg-white rounded-lg p-8 font-sans relative">
-          {uid ? (
-              <Tooltip title={isNoteFavorite ? "Remove from favorites" : "Add to favorites"}>
-              <IconButton 
-                onClick={handleToggleFavorite}
-                sx={{ 
-                  position: 'absolute', 
-                  top: '16px', 
-                  right: '16px',
-                  color: isNoteFavorite ? 'red' : 'gray',
-                  fontSize: 40
-                }}
-                aria-label={isNoteFavorite ? "remove from favorites" : "add to favorites"}
-              >
-                {isNoteFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-              </IconButton>
-            </Tooltip>
-          ): null}
-          
-          
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">{note.title}</h1>
-          <p className="text-lg text-gray-700 font-medium border-b pb-4 mb-4">
-            {subject.name} ({subject.subject_code})
-          </p>
-          <br></br>
-          <div 
-            id="content" 
-            className="prose prose-lg text-gray-800 leading-relaxed" 
-            dangerouslySetInnerHTML={{ __html: note.content }} 
-          />
+      <div 
+      className="relative flex justify-center items-start place-items-center">
+      <div
+        style={{
+          marginLeft: 20,
+          marginRight: 20,
+          marginBottom: 20,
+          boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px",
+          borderRadius: 20
+        }}
+       className="relative max-w-3xl w-full p-20 h-full font-sans top-2 bg-white">
+        <div 
+        style={{
+          padding: 30,
+          minHeight: 'calc(100vh - 120px)'
+        }}
+        className="p-10 w-full h-full">
+        {uid ? (
+            <Tooltip title={isNoteFavorite ? "Remove from favorites" : "Add to favorites"}>
+            <IconButton 
+              onClick={handleToggleFavorite}
+              sx={{ 
+                position: 'absolute', 
+                top: '16px', 
+                right: '16px',
+                color: isNoteFavorite ? 'red' : 'gray',
+                fontSize: 40
+              }}
+              aria-label={isNoteFavorite ? "remove from favorites" : "add to favorites"}
+            >
+              {isNoteFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+            </IconButton>
+          </Tooltip>
+        ): null}
+        
+        
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">{note.title}</h1>
+        <p 
+          style={{
+            paddingBottom: 20,
+            marginBottom: 20
+
+          }}
+          className="text-lg text-gray-700 font-medium border-b-gray-200 border-b mb-4">
+          {subject.name} ({subject.subject_code})
+        </p>
+
+        <div
+          id="content"
+          className="prose prose-lg text-gray-800 leading-relaxed mt-6"
+          dangerouslySetInnerHTML={{ __html: note.content }}
+        />
         </div>
       </div>
-    );
+    </div>
+  );
   }
 };
 
