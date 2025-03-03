@@ -8,6 +8,7 @@ import {
   getDoc,
   deleteDoc,
   updateDoc,
+  arrayUnion,
 } from "firebase/firestore";
 import { db } from "../../Config/firebase-config";
 import {
@@ -15,6 +16,7 @@ import {
   accessPolicyTypeToString,
   Note,
   CreateNoteInput,
+  NoteRating,
 } from "../interfaces/interface.notes";
 
 export const createNote = async (input: CreateNoteInput): Promise<string> => {
@@ -33,6 +35,7 @@ export const createNote = async (input: CreateNoteInput): Promise<string> => {
           allowed_groups: input.allowed_groups || [],
         }),
       },
+      note_ratings: []
     };
     const noteRef = await addDoc(collection(db, "notes"), noteData);
     return noteRef.id;
@@ -127,3 +130,21 @@ export const deleteNote = async (note_id: string): Promise<void> => {
     throw error;
   }
 };
+
+export const addNoteRating = async (note_id: string, note_rating: NoteRating): Promise<void> => {
+  try {
+    const userRef = doc(db, "notes", note_id);
+
+    await updateDoc(userRef, {
+      note_ratings: arrayUnion(note_rating)
+    });
+
+  } catch (error) {
+     console.error("Error adding rating:", error);
+    throw error;
+  }
+}
+
+export const getAverageRating = (note_ratings: NoteRating[]): number => {
+  return note_ratings.reduce((acc, current) => acc+current.rating, 0) / note_ratings.length;
+}
