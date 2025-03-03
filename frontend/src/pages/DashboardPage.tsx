@@ -13,6 +13,7 @@ export const DashboardPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [filteredSubjects, setFilteredSubjects] = useState<Subject[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
     
     useEffect(() => {
       const fetchSubjects = async () => {
@@ -33,9 +34,12 @@ export const DashboardPage: React.FC = () => {
     }, []);
 
   //handle search term changes 
-  const handleSearch = (filteredSubjects: Subject[]) => {
+  const handleSearch = (filteredSubjects: Subject[], term: string) => {
     setFilteredSubjects(filteredSubjects);
-    setPage(1); // Reset the page number to 1
+    if (term !== searchTerm){
+      setPage(1);
+    }
+    setSearchTerm(term);
   };
 
   // Pagination state
@@ -67,7 +71,7 @@ export const DashboardPage: React.FC = () => {
 
       {/* Søkebar */}
       <Box sx={{ mb: 5, textAlign: "center" }}>
-        <SearchBar subjects={subjects} onSearch={handleSearch} />
+        <SearchBar subjects={subjects} onSearch={(filtered: Subject[], term: string) => handleSearch(filtered, term)} />
       </Box>
         <Grid container spacing={3}>
           {currentCourses.map((course) => (
@@ -101,7 +105,7 @@ export const DashboardPage: React.FC = () => {
         Utforsk notater delt av engasjerte studenter på NTNU
       </Typography>
       <Box sx={{ mb: 5, textAlign: "center" }}>
-        <SearchBar subjects={subjects} onSearch={handleSearch} />
+        <SearchBar subjects={subjects} onSearch={(filtered: Subject[], term: string) => handleSearch(filtered, term)} />
       </Box>
         <Alert variant="filled" severity="info">
           Dette faget er dessverre ikke tilgjengelig.

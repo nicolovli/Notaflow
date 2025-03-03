@@ -4,7 +4,7 @@ import debounce from 'lodash.debounce';
 
 interface SearchBarProps {
   subjects: Subject[];
-  onSearch: (filteredSubjects: Subject[]) => void;
+  onSearch: (filteredSubjects: Subject[], term: string) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ subjects, onSearch }) => {
@@ -15,7 +15,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ subjects, onSearch }) => {
       subject.subject_code.toLowerCase().includes(term.toLowerCase()) ||
       subject.name.toLowerCase().includes(term.toLowerCase())
     );
-    onSearch(filtered); 
+    onSearch(filtered, term); 
   }, 300); 
 
   useEffect(() => {
