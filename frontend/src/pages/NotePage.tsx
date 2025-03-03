@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getNote } from "../firebase/func/notes";
+import { getNote, incrementNoteViewCount } from "../firebase/func/notes";
 import { Note } from "../firebase/interfaces/interface.notes";
 import { getSubject } from "../firebase/func/subject";
 import { Subject } from "../firebase/interfaces/interface.subject";
@@ -44,14 +44,18 @@ export const NotePage: React.FC = () => {
           
           const _notefav: boolean = await isFavorite(_uid, _note.id);
           setIsNoteFavorite(_notefav);
+
+          incrementNoteViewCount(id); // increment because user can now view page
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch subjects');
       } finally {
         setisLoading(false);
       }
+   
     };
     fetchAll();
+
   }, [id]);
 
   const handleToggleFavorite = () => {
