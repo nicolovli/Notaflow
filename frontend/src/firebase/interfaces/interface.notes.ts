@@ -44,6 +44,7 @@ export interface Note {
   content: string;
   date: Date;
   access_policy: NoteAccessPolicy;
+  note_ratings: NoteRating[];
 }
 
 // Types for the create note input
@@ -53,6 +54,13 @@ export interface CreateNoteInput {
   title: string;
   content: string;
   access_policy: AccessPolicyType;
-  allowed_users?: string[];  // Only used when access_policy is GROUP
-  allowed_groups?: string[]; // Only used when access_policy is GROUP
+  allowed_users?: string[];  // Only used when access_policy is GROUP/PUBLIC
+  allowed_groups?: string[]; // Only used when access_policy is GROUP/PUBLIC
+}
+
+export interface NoteRating {
+  rating: number;
+  rated_by_uid: string;
+  date: Date;
+  comment: string;
 }
