@@ -45,6 +45,20 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [deleted, setDeleted] = useState(false);
 
+
+  const [currentUserFirebase, setCurrentUserFirebase] = useState<BasicUserInfo | null>(null);
+
+useEffect(() => {
+  const fetchUserData = async () => {
+    if (currentUser) {
+      const userData = await getAdditionalUserData(currentUser.uid);
+      setCurrentUserFirebase(userData);
+    }
+  };
+
+  fetchUserData();
+}, [currentUser]);
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -99,7 +113,7 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
           boxShadow: 4,
         },
       }}>
-      {currentUser?.uid === note.user_id && (
+      {(currentUser?.uid === note.user_id || currentUserFirebase?.isAdmin === true) && (
         <>
           <IconButton
             aria-label="options"

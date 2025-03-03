@@ -7,6 +7,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import MuiDrawer from "@mui/material/Drawer";
 import { styled, Theme, CSSObject } from "@mui/material/styles";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import {
   List,
   ListItem,
@@ -16,6 +17,11 @@ import {
   IconButton,
   Divider,
 } from "@mui/material";
+import { useState } from "react";
+import { BasicUserInfo } from "../firebase/interfaces/interface.userInfo";
+import { getAdditionalUserData } from "../firebase/func/user";
+import { auth } from "../Config/firebase-config";
+
 
 const drawerWidth = 240; // Drawer width when expanded
 
@@ -72,17 +78,38 @@ const NAVIGATION = [
   { segment: "Dashboard", title: "Dashboard", icon: <DashboardIcon /> },
   { segment: "myNotes", title: "Mine notater", icon: <StickyNote2Icon /> },
   { segment: "myFavoriteNotes", title: "Favoritter", icon: <FavoriteIcon /> },
+  { segment: "createCourse", title: "Opprett Fag", icon: <CreateNewFolderIcon />, adminOnly: true }
 ];
 
 const NavigationDrawer: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = React.useState(false);
+  const [currentUserFirebase, setCurrentUserFirebase] = useState<BasicUserInfo | null>(null);
+  const currentUser = auth.currentUser;
 
   const handleNavigation = (segment?: string) => {
     if (!segment) return;
     navigate(`/${segment}`);
   };
+
+  const filteredNavigation = NAVIGATION.filter(
+    (item) => !item.adminOnly || (currentUserFirebase?.isAdmin === true)
+  );
+
+ 
+
+React.useEffect(() => {
+  const fetchUserData = async () => {
+    if (currentUser) {
+      const userData = await getAdditionalUserData(currentUser.uid);
+      setCurrentUserFirebase(userData);
+    }
+  };
+
+  fetchUserData();
+}, [currentUser]);
+
 
   return (
     <StyledDrawer variant="permanent" open={open} PaperProps={{ style: { position: "relative" } }}>
@@ -93,7 +120,7 @@ const NavigationDrawer: React.FC = () => {
       </DrawerHeader>
       <Divider />
       <List>
-        {NAVIGATION.map((item) => {
+        {filteredNavigation.map((item) => {
           const isActive = location.pathname.includes(item.segment);
           return (
             <ListItem key={item.segment} disablePadding>

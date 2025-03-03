@@ -12,6 +12,7 @@ import { MyNotesPage } from "./pages/MyNotesPage";
 import { FavoriteNotesPage } from "./pages/FavoriteNotesPage";
 import NavigationDrawer from "./components/NavigationDrawer";
 import FloatingPlusButton from "./components/FloatingPlusButton";
+import CreateCoursePage from "./pages/CreateCoursePage";
 
 /**
  * Root component of the application.
@@ -48,6 +49,7 @@ export const App = () => {
               <Route path="/myNotes" element={<MyNotesPage />} />
               <Route path="/myFavoriteNotes" element={<FavoriteNotesPage />} />
               <Route path="/PublishingPage" element={<PublishingPage />} />
+              <Route path="/createCourse" element={<CreateCoursePage />} />
             </Route>
           </Routes>
         </div>
