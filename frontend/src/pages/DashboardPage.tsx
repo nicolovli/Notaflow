@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Box, CircularProgress, Pagination, Alert } from "@mui/material";
+import { Box, CircularProgress, Pagination, Alert, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid"; 
 import CourseCard from "../components/CourseCard";
 import SearchBar from "../components/SearchBar";
 import { Subject } from "../firebase/interfaces/interface.subject";
 import { getAllSubjects } from "../firebase/func/subject";
+
 
 export const DashboardPage: React.FC = () => {
 
@@ -55,8 +56,19 @@ export const DashboardPage: React.FC = () => {
       setPage(value);
     };
     return (
-      <Box sx={{ pt: 10, pr: 12, pb: 3, pl: 12 }}>
+      <Box sx={{ pt: 5, pr: 12, pb: 3, pl: 12}}>
+          {/* Overskrift */}
+      <Typography variant="h3" color="#19262d" sx={{ fontWeight: "bold", mb: 1, textAlign: "center" }}>
+        Tilgjengelige fag
+      </Typography>
+      <Typography variant="h6" color="textSecondary" sx={{ mb: 4, textAlign: "center" }}>
+        Utforsk notater delt av engasjerte studenter på NTNU
+      </Typography>
+
+      {/* Søkebar */}
+      <Box sx={{ mb: 5, textAlign: "center" }}>
         <SearchBar subjects={subjects} onSearch={handleSearch} />
+      </Box>
         <Grid container spacing={3}>
           {currentCourses.map((course) => (
             <Grid item 

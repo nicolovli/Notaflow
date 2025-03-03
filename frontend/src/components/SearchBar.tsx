@@ -34,9 +34,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ subjects, onSearch }) => {
         type="text"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder="Søk på fag"
-        className="w-80 h-10 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Søk etter fag"
+        className="w-120 h-12 p-2 text-center pl-4 border rounded-2xl bg-[#D9D9D9] focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
+      
     </div>
   );
 };
