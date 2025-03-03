@@ -18,7 +18,8 @@ export const getAdditionalUserData = async (id: string): Promise<BasicUserInfo> 
           id: userSnap.id,
           firstName: userData.firstName,
           lastName: userData.lastName,
-          username: userData.username
+          username: userData.username,
+          isAdmin: userData.isAdmin
         } as BasicUserInfo;
         
       } catch (error) {

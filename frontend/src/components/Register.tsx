@@ -129,6 +129,7 @@ export const AuthRegister: React.FC = () => {
         firstName: firstName,
         lastName: lastName,
         username: username,
+        isAdmin: false
       });
       console.log("Brukerdata lagret i Firestore:", auth.currentUser?.email);
 
