@@ -45,6 +45,7 @@ export interface Note {
   date: Date;
   access_policy: NoteAccessPolicy;
   note_ratings: NoteRating[];
+  view_counter: number;
 }
 
 // Types for the create note input
