@@ -90,13 +90,32 @@ export const DashboardPage: React.FC = () => {
         </Box>
       </Box>
     );
-  } else if (isLoading == false && (filteredSubjects.length == 0 || error)) { 
+  } else if (isLoading == false && (filteredSubjects.length == 0)) { 
+    return (
+      <Box sx={{ pt: 5, pr: 12, pb: 3, pl: 12 }}>
+          {/* Overskrift */}
+      <Typography variant="h3" color="#19262d" sx={{ fontWeight: "bold", mb: 1, textAlign: "center" }}>
+        Tilgjengelige fag
+      </Typography>
+      <Typography variant="h6" color="textSecondary" sx={{ mb: 4, textAlign: "center" }}>
+        Utforsk notater delt av engasjerte studenter på NTNU
+      </Typography>
+      <Box sx={{ mb: 5, textAlign: "center" }}>
+        <SearchBar subjects={subjects} onSearch={handleSearch} />
+      </Box>
+        <Alert variant="filled" severity="info">
+          Dette faget er dessverre ikke tilgjengelig.
+        </Alert>
+      </Box>
+    )
+  } else if(isLoading == false && error){
     return (
       <Alert variant="filled" severity="error">
         An error occured. Check you network connection
       </Alert>
     )
-  } else {
+  }
+  else {
     return (
       <div className="w-full h-full w flex justify-center items-center">
         <CircularProgress />
