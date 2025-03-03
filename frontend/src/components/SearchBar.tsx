@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Subject } from '../firebase/interfaces/interface.subject';
-import debounce from 'lodash.debounce'; // Import debounce from lodash
+import debounce from 'lodash.debounce'; 
 
 interface SearchBarProps {
   subjects: Subject[];
@@ -10,19 +10,18 @@ interface SearchBarProps {
 const SearchBar: React.FC<SearchBarProps> = ({ subjects, onSearch }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Debounce the search function
   const debouncedSearch = debounce((term: string) => {
     const filtered = subjects.filter(subject =>
       subject.subject_code.toLowerCase().includes(term.toLowerCase()) ||
       subject.name.toLowerCase().includes(term.toLowerCase())
     );
-    onSearch(filtered); // Pass the filtered list to the parent component
-  }, 300); // 300ms delay
+    onSearch(filtered); 
+  }, 300); 
 
   useEffect(() => {
-    debouncedSearch(searchTerm); // Trigger debounced search when searchTerm changes
+    debouncedSearch(searchTerm);
 
-    // Cleanup debounce on unmount
+   
     return () => {
       debouncedSearch.cancel();
     };
