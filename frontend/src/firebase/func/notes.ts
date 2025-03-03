@@ -7,6 +7,7 @@ import {
   doc,
   getDoc,
   deleteDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../../Config/firebase-config";
 import {
@@ -61,12 +62,12 @@ export const getNotesBySubject = async (subject_id: string): Promise<Note[]> => 
   }
 };
 
-export const getNote = async (id: string): Promise<Note> => {
+export const getNote = async (noteId: string): Promise<Note> => {
   try {
-    const noteRef = doc(db, "notes", id);
+    const noteRef = doc(db, "notes", noteId);
     const noteSnap = await getDoc(noteRef);
     if (!noteSnap.exists()) {
-      throw new Error(`Subject with ID ${id} not found`);
+      throw new Error(`Subject with ID ${noteId} not found`);
     }
     const data = noteSnap.data();
     return {
@@ -104,6 +105,22 @@ export const deleteNote = async (note_id: string): Promise<void> => {
   try {
     const noteRef = doc(db, "notes", note_id);
     await deleteDoc(noteRef);
+
+    const userRef = collection(db, "users");
+    const usersSnapshot = await getDocs(userRef);
+
+    const batchUpdates = usersSnapshot.docs.map(async (userDoc) => {
+      const userData = userDoc.data();
+      if (userData.favorites) {
+        const updatedFavorites = userData.favorites.filter(
+          (fav: { noteId: string }) => fav.noteId !== note_id
+        );
+        await updateDoc(userDoc.ref, { favorites: updatedFavorites });
+      }
+    });
+
+    await Promise.all(batchUpdates);
+
     console.log(`Note with ID ${note_id} has been successfully deleted.`); //fjern eventuelt
   } catch (error) {
     console.error("Error deleting note:", error);
