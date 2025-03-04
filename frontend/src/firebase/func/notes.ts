@@ -60,6 +60,7 @@ export const getNotesBySubject = async (subject_id: string): Promise<Note[]> => 
         id: doc.id,
         ...data,
         date: data.date?.toDate(), // Convert Timestamp to Date
+        note_ratings: data.note_ratings || []
       };
     }) as Note[];
     return notes;
@@ -81,6 +82,7 @@ export const getNote = async (noteId: string): Promise<Note> => {
       id: noteSnap.id,
       ...data,
       date: data.date?.toDate(),
+      note_ratings: data.note_ratings || []
     } as Note;
   } catch (error) {
     console.error("Error fetching subject:", error);
@@ -99,6 +101,7 @@ export const getUserNotes = async (user_id: string): Promise<Note[]> => {
         id: doc.id,
         ...data,
         date: data.date?.toDate(),
+        note_ratings: data.note_ratings || []
       };
     }) as Note[];
     return notes;
@@ -149,7 +152,13 @@ export const addNoteRating = async (note_id: string, note_rating: NoteRating): P
   }
 }
 
+export const hasUserRatedNote = (user_id: string, note_ratings: NoteRating[]): boolean => {
+  return note_ratings.map(n => n.rated_by_uid).includes(user_id);
+}
+
 export const getAverageRating = (note_ratings: NoteRating[]): number => {
+  if (note_ratings.length == 0)
+    return 0
   return note_ratings.reduce((acc, current) => acc+current.rating, 0) / note_ratings.length;
 }
 

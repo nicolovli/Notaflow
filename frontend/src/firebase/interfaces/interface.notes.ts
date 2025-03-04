@@ -63,5 +63,4 @@ export interface NoteRating {
   rating: number;
   rated_by_uid: string;
   date: Date;
-  comment: string;
 }
