@@ -79,7 +79,7 @@ export const AuthLogin: React.FC = () => {
           required
           error={!!passwordError}
           helperText={passwordError || ""}
-          placeholder="Password"
+          placeholder="Passord"
           type="password"
           onChange={(e) => setPassword(e.target.value)}
         />

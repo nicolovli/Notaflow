@@ -13,6 +13,7 @@ import { FavoriteNotesPage } from "./pages/FavoriteNotesPage";
 import NavigationDrawer from "./components/NavigationDrawer";
 import FloatingPlusButton from "./components/FloatingPlusButton";
 import CreateCoursePage from "./pages/CreateCoursePage";
+import GlobalSnackbar from "./components/GlobalSnackbar";
 
 /**
  * Root component of the application.
@@ -50,10 +51,12 @@ export const App = () => {
               <Route path="/myFavoriteNotes" element={<FavoriteNotesPage />} />
               <Route path="/PublishingPage" element={<PublishingPage />} />
               <Route path="/createCourse" element={<CreateCoursePage />} />
+              <Route path="/publishingpage/:id" element={<PublishingPage />} />
             </Route>
           </Routes>
         </div>
       </div>
+      <GlobalSnackbar />
     </div>
   );
 };

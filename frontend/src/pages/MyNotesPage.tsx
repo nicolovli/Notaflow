@@ -5,12 +5,14 @@ import { Note } from "../firebase/interfaces/interface.notes";
 import { auth } from "../Config/firebase-config";
 import { useNavigate } from "react-router-dom";
 import { getUserNotes } from "../firebase/func/notes";
+import { useLocation } from "react-router-dom";
 
 export const MyNotesPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [page, setPage] = useState(1);
   const notesPerPage = 12;
-
   const [notes, setNotes] = useState<Note[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,6 +40,12 @@ export const MyNotesPage: React.FC = () => {
     }
     fetchNotes();
   }, [navigate]);
+
+  useEffect(() => {
+    if (location.state?.message) {
+      window.history.replaceState({}, "");
+    }
+  }, [location]);
 
   if (isLoading) {
     return (

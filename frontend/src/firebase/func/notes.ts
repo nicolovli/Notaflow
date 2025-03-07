@@ -11,7 +11,7 @@ import {
   arrayUnion,
   increment,
   orderBy,
-  limit
+  limit,
 } from "firebase/firestore";
 import { db } from "../../Config/firebase-config";
 import {
@@ -39,7 +39,7 @@ export const createNote = async (input: CreateNoteInput): Promise<string> => {
         }),
       },
       note_ratings: [],
-      view_counter: 0
+      view_counter: 0,
     };
     const noteRef = await addDoc(collection(db, "notes"), noteData);
     return noteRef.id;
@@ -60,7 +60,7 @@ export const getNotesBySubject = async (subject_id: string): Promise<Note[]> => 
         id: doc.id,
         ...data,
         date: data.date?.toDate(), // Convert Timestamp to Date
-        note_ratings: data.note_ratings || []
+        note_ratings: data.note_ratings || [],
       };
     }) as Note[];
     return notes;
@@ -82,7 +82,7 @@ export const getNote = async (noteId: string): Promise<Note> => {
       id: noteSnap.id,
       ...data,
       date: data.date?.toDate(),
-      note_ratings: data.note_ratings || []
+      note_ratings: data.note_ratings || [],
     } as Note;
   } catch (error) {
     console.error("Error fetching subject:", error);
@@ -101,7 +101,7 @@ export const getUserNotes = async (user_id: string): Promise<Note[]> => {
         id: doc.id,
         ...data,
         date: data.date?.toDate(),
-        note_ratings: data.note_ratings || []
+        note_ratings: data.note_ratings || [],
       };
     }) as Note[];
     return notes;
@@ -130,10 +130,21 @@ export const deleteNote = async (note_id: string): Promise<void> => {
     });
 
     await Promise.all(batchUpdates);
-
-    console.log(`Note with ID ${note_id} has been successfully deleted.`); //fjern eventuelt
   } catch (error) {
     console.error("Error deleting note:", error);
+    throw error;
+  }
+};
+
+export const updateNote = async (
+  noteId: string,
+  updatedData: Partial<CreateNoteInput>
+): Promise<void> => {
+  try {
+    const noteRef = doc(db, "notes", noteId);
+    await updateDoc(noteRef, updatedData);
+  } catch (error) {
+    console.error("Error updating note:", error);
     throw error;
   }
 };
@@ -143,37 +154,35 @@ export const addNoteRating = async (note_id: string, note_rating: NoteRating): P
     const noteRef = doc(db, "notes", note_id);
 
     await updateDoc(noteRef, {
-      note_ratings: arrayUnion(note_rating)
+      note_ratings: arrayUnion(note_rating),
     });
-
   } catch (error) {
-     console.error("Error adding rating:", error);
+    console.error("Error adding rating:", error);
     throw error;
   }
-}
+};
 
 export const hasUserRatedNote = (user_id: string, note_ratings: NoteRating[]): boolean => {
-  return note_ratings.map(n => n.rated_by_uid).includes(user_id);
-}
+  return note_ratings.map((n) => n.rated_by_uid).includes(user_id);
+};
 
 export const getAverageRating = (note_ratings: NoteRating[]): number => {
-  if (note_ratings.length == 0)
-    return 0
-  return note_ratings.reduce((acc, current) => acc+current.rating, 0) / note_ratings.length;
-}
+  if (note_ratings.length == 0) return 0;
+  return note_ratings.reduce((acc, current) => acc + current.rating, 0) / note_ratings.length;
+};
 
 export const incrementNoteViewCount = async (note_id: string): Promise<void> => {
   try {
     const noteRef = doc(db, "notes", note_id);
 
     await updateDoc(noteRef, {
-      view_counter: increment(1)
+      view_counter: increment(1),
     });
   } catch (error) {
     console.log("Error while incrementing note view count", error);
     throw error;
   }
-}
+};
 
 export const getMostViewedNotes = async (i: number): Promise<Note[]> => {
   try {
@@ -185,10 +194,10 @@ export const getMostViewedNotes = async (i: number): Promise<Note[]> => {
       orderBy("view_counter", "desc"),
       limit(i)
     );
-    
+
     const querySnapshot = await getDocs(q);
     const notes: Note[] = [];
-    
+
     querySnapshot.forEach((doc) => {
       const data = doc.data();
       notes.push({
@@ -199,9 +208,8 @@ export const getMostViewedNotes = async (i: number): Promise<Note[]> => {
     });
 
     return notes;
-    
   } catch (error) {
     console.error(`Failed to retrive the ${i} most viewed public notes`, error);
-    throw error; 
+    throw error;
   }
-}
+};

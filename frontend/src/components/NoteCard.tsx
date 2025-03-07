@@ -14,12 +14,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
-  Snackbar,
 } from "@mui/material";
-import Slide, { SlideProps } from "@mui/material/Slide";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DialogActions from "@mui/material/DialogActions";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Note } from "../firebase/interfaces/interface.notes";
 import { getAdditionalUserData } from "../firebase/func/user";
 import { BasicUserInfo } from "../firebase/interfaces/interface.userInfo";
@@ -31,10 +29,6 @@ interface Props {
   onDelete: (noteId: string) => void;
 }
 
-function SlideTransition(props: SlideProps) {
-  return <Slide {...props} direction="up" />;
-}
-
 const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
   const currentUser = auth.currentUser;
   const [userInfo, setUserInfo] = useState<BasicUserInfo | null>(null);
@@ -42,8 +36,7 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
   const [error, setError] = useState<string | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [open, setOpen] = useState(false);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [deleted, setDeleted] = useState(false);
+  const navigate = useNavigate();
 
 
   const [currentUserFirebase, setCurrentUserFirebase] = useState<BasicUserInfo | null>(null);
@@ -73,10 +66,10 @@ useEffect(() => {
     };
 
     fetchUser();
-  }, [note, deleted]);
+  }, [note]);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation(); // Stopper klikket fra å trigge navigasjon
+    event.stopPropagation();
     setAnchorEl(event.currentTarget);
   };
 
@@ -85,18 +78,15 @@ useEffect(() => {
   };
 
   const handleEdit = () => {
-    // console.log("Edit note", note.id);
+    navigate(`/publishingpage/${note.id}`);
     handleMenuClose();
   };
 
   const handleDelete = async () => {
     try {
       await deleteNote(note.id);
-      setSnackbarOpen(true);
-      setDeleted(true);
-      setTimeout(() => {
-        onDelete(note.id);
-      }, 2000);
+      navigate(+0, { state: { message: "Notatet er slettet!" } });
+      onDelete(note.id);
     } catch (err) {
       console.error("Failed to delete note:", err);
     }
@@ -186,15 +176,6 @@ useEffect(() => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={4000}
-        onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        TransitionComponent={SlideTransition}
-        message="Ditt notat er nå blitt slettet!"
-      />
     </Card>
   );
 };

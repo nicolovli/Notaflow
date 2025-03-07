@@ -22,17 +22,14 @@ export const FavoriteNotesPage: React.FC = () => {
           navigate("/login");
           return;
         }
-
         const favorites: Note[] = await getFavorteNotes(auth.currentUser.uid);
-
         setNotes(favorites);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch favorite notes");
+        setError(err instanceof Error ? err.message : "Failed to fetch subjects");
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchFavorites();
   }, [navigate]);
 
@@ -45,13 +42,13 @@ export const FavoriteNotesPage: React.FC = () => {
   } else if (error) {
     return (
       <Alert variant="filled" severity="error">
-        An error occurred. Check your network connection.
+        An error occured. Check you network connection
       </Alert>
     );
   } else if (notes.length < 1) {
     return (
       <Alert severity="info">
-        Du har ikke favoritisert noen notater enda. Favoritiserte notater vil vises her.
+        Du har ikke favoritisert noen notater enda. Favoritiserte notater vil vises her
       </Alert>
     );
   }
@@ -67,7 +64,7 @@ export const FavoriteNotesPage: React.FC = () => {
       <Typography
         variant="h4"
         sx={{ pt: 4, textAlign: "center", fontFamily: "Roboto, sans-serif", mb: 4 }}>
-        Favoritt Notater
+        Favorittnotater
       </Typography>
 
       <Box sx={{ pt: 5, pr: 12, pb: 3, pl: 12 }}>
