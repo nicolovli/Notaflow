@@ -1,56 +1,91 @@
-import React, {useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactQuill from "react-quill-new";
-import 'react-quill-new/dist/quill.snow.css';
-import { createNote } from "../firebase/func/notes";
+import "react-quill-new/dist/quill.snow.css";
+import { createNote, updateNote, getNote } from "../firebase/func/notes";
+import { getSubject } from "../firebase/func/subject";
 import { CreateNoteInput } from "../firebase/interfaces/interface.notes";
 import { auth } from "../Config/firebase-config";
-import { stringToAccessPolicyType } from "../firebase/interfaces/interface.notes";
+// import { stringToAccessPolicyType } from "../firebase/interfaces/interface.notes";
+import { AccessPolicyType } from "../firebase/interfaces/interface.notes";
 import CourseSelector from "./courseSelector";
 import { Subject } from "../firebase/interfaces/interface.subject";
-import { TextField, Alert } from "@mui/material";
+import { TextField, CircularProgress } from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
 
-
- 
 const FormComponent = () => {
+  const { id: noteId } = useParams();
+  const navigate = useNavigate();
+
   const [title, setTitle] = useState("");
-  const [option, setOption] = useState("public");
+  // const [option, setOption] = useState("public");
   const [text, setText] = useState("");
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [resetKey, setResetKey] = useState(0);
 
   //Error fields
   const [titleError, setTitleError] = useState<string | null>(null);
   // const [optionError, setOptionError] = useState<string | null>(null);
   const [textError, setTextError] = useState<string | null>(null);
   const [selectedSubjectError, setSelectedSubjectError] = useState<string | null>(null);
-  const [resetKey, setResetKey] = useState<number>(0);
 
-  // Success feedback state
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  useEffect(() => {
+    if (!noteId) {
+      setTitle("");
+      setText("");
+      setSelectedSubject(null);
+      setResetKey((prev) => prev + 1);
+      return;
+    }
+    setLoading(true);
+    getNote(noteId)
+      .then(async (note) => {
+        setTitle(note.title);
+        setText(note.content);
+        // setOption(note.access_policy.type);
 
+        try {
+          const subject = await getSubject(note.subject_id);
+          setSelectedSubject(subject);
+          setLoading(false);
+          // console.log(subject);
+        } catch (error) {
+          console.error("Kunne ikke hente faget:", error);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching note:", error);
+      })
+      .finally(() => {});
+  }, [noteId]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   console.log({ title, option, selectedSubject, text });
+  // };
+
+  //Send in form
+  const onSubmit = async (e: React.FormEvent) => {
+    // Reset errormessages
+    setSelectedSubjectError(null);
+    setTitleError(null);
+    setTextError(null);
+
     e.preventDefault();
-    console.log({ title, option, selectedSubject, text });
 
-  };
-
-  //Send in form 
-  const onSubmit = () => {
-    console.log(selectedSubject)
-    
     // setOptionError(null);
     setSelectedSubjectError(null);
     setTitleError(null);
     setTextError(null);
-    
+
     //Error handling
     let hasError = false;
 
     if (title.trim().length === 0) {
       setTitleError("Du må skrive inn en tittel for notatet");
       hasError = true;
-    } 
-  
+    }
+
     if (text.trim().length < 20) {
       setTextError("Du må skrive inn tekst i notatet. Må være på minst 20 tegn.");
       hasError = true;
@@ -65,75 +100,137 @@ const FormComponent = () => {
     //   setOptionError("Du må velge en tilgjengelighet");
     //   hasError = true;
     // }
-  
+
     //Don´t continoue if there is errors
     if (hasError) {
-      return
+      return;
     }
-
-    //Clear fields if no errors
-    setSuccessMessage("Notatet har blitt publisert");
-    setTitle("");
-    setOption("public");
-    setText("");
-    setSelectedSubject(null);
-    setResetKey(resetKey+1);
-
 
     //Create input
     const input: CreateNoteInput = {
       user_id: auth.currentUser?.uid ?? "unkown user",
-      subject_id: selectedSubject?.id ?? "empty" ,
+      subject_id: selectedSubject?.id ?? "empty",
       title: title,
       content: text,
-      access_policy: stringToAccessPolicyType(option)
-      
-  }
-  createNote(input)
-  
-  }
+      access_policy: AccessPolicyType.PUBLIC, // Setter en standardverdi for å unngå feil
+      // access_policy: stringToAccessPolicyType(option),
+    };
 
-  const handleSubjectSelect = (subject: Subject | null) => {
-    setSelectedSubject(subject);
-  }
-
-  //The success message disapear after 5 seconds
-  useEffect(() => {
-    if (successMessage) {
-      const timer = setTimeout(() => {
-        setSuccessMessage(null);
-      }, 5000);
-      return () => clearTimeout(timer);
+    try {
+      if (noteId) {
+        await updateNote(noteId, input);
+        navigate(`/notes/${noteId}`, { state: { message: "Notatet er oppdatert!" } });
+      } else {
+        await createNote(input);
+        navigate("/myNotes", { state: { message: "Notatet er publisert!" } });
+      }
+      //Clear fields if no errors
+      setTitle("");
+      // setOption("public");
+      setText("");
+      setSelectedSubject(null);
+      setResetKey(resetKey + 1);
+    } catch (error) {
+      console.error("Error saving note:", error);
     }
-  }, [successMessage]);
-  
+  };
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          backgroundColor: "#f3f4f6",
+        }}>
+        <CircularProgress />
+      </div>
+    );
+  }
 
   return (
     <>
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", backgroundColor: "#f3f4f6" }}>
-      <div style={{ width: "100%", maxWidth: "600px", padding: "20px", backgroundColor: "white", borderRadius: "10px", boxShadow: "0 0 10px rgba(0,0,0,0.1)" }}>
-        <h2 style={{ fontSize: "20px", fontWeight: "bold", marginBottom: "15px", fontFamily: "sans-serif"}}>Publiser et notat!</h2>
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-          <div>
-            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", fontFamily: "sans-serif" }}>Tittel</label>
-            <TextField
-              type="text"
-              value={title}
-              error = {!!titleError}
-              helperText = {titleError}
-              onChange={(e) => setTitle(e.target.value)}
-              style={{ width: "100%", padding: "8px",  borderRadius: "5px", fontFamily: "sans-serif" }}
-              placeholder="Skriv inn tittel..."
-            />
-          </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+          backgroundColor: "#f3f4f6",
+        }}>
+        <div
+          style={{
+            width: "100%",
+            maxWidth: "600px",
+            padding: "20px",
+            backgroundColor: "white",
+            borderRadius: "10px",
+            boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+          }}>
+          <>
+            <h2
+              style={{
+                fontSize: "20px",
+                fontWeight: "bold",
+                marginBottom: "15px",
+                fontFamily: "sans-serif",
+              }}>
+              {noteId ? "Rediger notat" : "Publiser et notat!"}
+            </h2>
+            <form
+              onSubmit={onSubmit}
+              style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    fontFamily: "sans-serif",
+                  }}>
+                  Tittel
+                </label>
+                <TextField
+                  type="text"
+                  value={title}
+                  error={!!titleError}
+                  autoComplete="off"
+                  helperText={titleError}
+                  onChange={(e) => setTitle(e.target.value)}
+                  style={{
+                    width: "100%",
+                    borderRadius: "5px",
+                    fontFamily: "sans-serif",
+                  }}
+                  placeholder="Skriv inn tittel..."
+                />
+              </div>
 
-          <div>
-            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", fontFamily: "sans-serif" }}>Fag</label>
-              <CourseSelector key={resetKey} onSubjectSelect={handleSubjectSelect} />
-              {selectedSubjectError && <p style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>{selectedSubjectError}</p>}
-          </div>
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    fontFamily: "sans-serif",
+                  }}>
+                  Fag
+                </label>
+                <CourseSelector
+                  key={resetKey}
+                  onSubjectSelect={setSelectedSubject}
+                  selectedSubject={selectedSubject}
+                />
+                {selectedSubjectError && (
+                  <p style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>
+                    {selectedSubjectError}
+                  </p>
+                )}
+              </div>
 
-          {/* <div>
+              {/* <div>
             <label style={{ display: "block", fontSize: "14px", fontWeight: "500", fontFamily: "sans-serif" }}>Tilgjengelighet</label>
             <select
               value={option}
@@ -148,21 +245,42 @@ const FormComponent = () => {
             {optionError && <p style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>{optionError}</p>}
           </div> */}
 
-          <div>
-            <label style={{ display: "block", fontSize: "14px", fontWeight: "500" }}>Notat</label>
-            <ReactQuill value={text} onChange={setText}  style={{ backgroundColor: "white", border: textError ? "1px solid red" : "1px solid #ccc", borderRadius: "5px" }}  />
-            {textError && <p style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>{textError}</p>}
-          </div>
+              <div>
+                <label style={{ display: "block", fontSize: "14px", fontWeight: "500" }}>
+                  Notat
+                </label>
+                <ReactQuill
+                  key={resetKey}
+                  value={text}
+                  onChange={setText}
+                  style={{
+                    backgroundColor: "white",
+                    border: textError ? "1px solid red" : "1px solid #ccc",
+                    borderRadius: "5px",
+                  }}
+                />
+                {textError && (
+                  <p style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>{textError}</p>
+                )}
+              </div>
 
-          <button type="submit" style={{ width: "100%", padding: "10px", backgroundColor: "#007BFF", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }} onClick={onSubmit}>
-            Send inn
-          </button>
-
-      
-          {successMessage && <Alert severity={"success"}>{successMessage}</Alert>}
-        </form>
+              <button
+                type="submit"
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  backgroundColor: "#007BFF",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}>
+                {noteId ? "Oppdater" : "Lag notat"}
+              </button>
+            </form>
+          </>
+        </div>
       </div>
-    </div>
     </>
   );
 };
