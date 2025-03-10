@@ -84,7 +84,10 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
   const handleDelete = async () => {
     try {
       await deleteNote(note.id);
-      navigate("/", { state: { message: "Notatet er slettet!" } });
+      window.history.replaceState(
+        { ...window.history.state, usr: { message: "Notatet er slettet!" } },
+        ""
+      );
       onDelete(note.id);
     } catch (err) {
       console.error("Failed to delete note:", err);
