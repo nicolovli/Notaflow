@@ -45,6 +45,7 @@ export interface Note {
   date: Date;
   access_policy: NoteAccessPolicy;
   note_ratings: NoteRating[];
+  note_comments: NoteComment[];
   view_counter: number;
 }
 
@@ -62,5 +63,11 @@ export interface CreateNoteInput {
 export interface NoteRating {
   rating: number;
   rated_by_uid: string;
+  date: Date;
+}
+
+export interface NoteComment {
+  comment: string;
+  comment_by_uid: string;
   date: Date;
 }

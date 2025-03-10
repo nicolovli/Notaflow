@@ -20,6 +20,7 @@ import {
   Note,
   CreateNoteInput,
   NoteRating,
+  NoteComment,
 } from "../interfaces/interface.notes";
 
 export const createNote = async (input: CreateNoteInput): Promise<string> => {
@@ -39,6 +40,7 @@ export const createNote = async (input: CreateNoteInput): Promise<string> => {
         }),
       },
       note_ratings: [],
+      note_comments: [],
       view_counter: 0,
     };
     const noteRef = await addDoc(collection(db, "notes"), noteData);
@@ -83,6 +85,7 @@ export const getNote = async (noteId: string): Promise<Note> => {
       ...data,
       date: data.date?.toDate(),
       note_ratings: data.note_ratings || [],
+      note_comments: data.note_comments || [],
     } as Note;
   } catch (error) {
     console.error("Error fetching subject:", error);
@@ -102,6 +105,7 @@ export const getUserNotes = async (user_id: string): Promise<Note[]> => {
         ...data,
         date: data.date?.toDate(),
         note_ratings: data.note_ratings || [],
+        note_comments: data.note_comments || [],
       };
     }) as Note[];
     return notes;
@@ -161,6 +165,19 @@ export const addNoteRating = async (note_id: string, note_rating: NoteRating): P
     throw error;
   }
 };
+
+export const addComment = async (note_id: string, note_comment: NoteComment): Promise<void> => {
+  try {
+    const noteRef = doc (db,"notes", note_id)
+      
+    await updateDoc(noteRef, {
+      note_comment: arrayUnion(note_comment)
+    });
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    throw error;
+  }
+}
 
 export const hasUserRatedNote = (user_id: string, note_ratings: NoteRating[]): boolean => {
   return note_ratings.map((n) => n.rated_by_uid).includes(user_id);
