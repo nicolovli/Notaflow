@@ -31,7 +31,7 @@ export const createNote = async (input: CreateNoteInput): Promise<string> => {
       content: input.content,
       date: new Date(),
       access_policy: {
-        type: accessPolicyTypeToString(input.access_policy),
+        type: accessPolicyTypeToString(input.access_policy!),
         ...((input.access_policy === AccessPolicyType.GROUP ||
           input.access_policy === AccessPolicyType.PUBLIC) && {
           allowed_users: input.allowed_users || [],
