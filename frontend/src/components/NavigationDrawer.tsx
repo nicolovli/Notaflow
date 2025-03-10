@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import StickyNote2Icon from "@mui/icons-material/StickyNote2";
@@ -7,7 +7,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import MuiDrawer from "@mui/material/Drawer";
 import { styled, Theme, CSSObject } from "@mui/material/styles";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
+import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import {
   List,
   ListItem,
@@ -17,11 +17,10 @@ import {
   IconButton,
   Divider,
 } from "@mui/material";
-import { useState } from "react";
 import { BasicUserInfo } from "../firebase/interfaces/interface.userInfo";
 import { getAdditionalUserData } from "../firebase/func/user";
 import { auth } from "../Config/firebase-config";
-
+import { onAuthStateChanged } from "firebase/auth";
 
 const drawerWidth = 240; // Drawer width when expanded
 
@@ -49,7 +48,6 @@ const closedMixin = (theme: Theme): CSSObject => ({
 const DrawerHeader = styled("div")<{ open: boolean }>(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  // justifyContent: open ? "flex-end" : "center",
   justifyContent: "flex-end",
   padding: theme.spacing(0, 2.3),
   ...theme.mixins.toolbar,
@@ -74,11 +72,14 @@ const StyledDrawer = styled(MuiDrawer, {
 }));
 
 // List of navigation items(pages). (Add new ones here)
-const NAVIGATION = [
+const BASE_NAVIGATION = [
   { segment: "Dashboard", title: "Dashboard", icon: <DashboardIcon /> },
   { segment: "myNotes", title: "Mine notater", icon: <StickyNote2Icon /> },
   { segment: "myFavoriteNotes", title: "Favoritter", icon: <FavoriteIcon /> },
-  { segment: "createCourse", title: "Opprett Fag", icon: <CreateNewFolderIcon />, adminOnly: true }
+];
+
+const ADMIN_NAVIGATION = [
+  { segment: "createCourse", title: "Opprett Fag", icon: <CreateNewFolderIcon /> },
 ];
 
 const NavigationDrawer: React.FC = () => {
@@ -86,30 +87,31 @@ const NavigationDrawer: React.FC = () => {
   const location = useLocation();
   const [open, setOpen] = React.useState(false);
   const [currentUserFirebase, setCurrentUserFirebase] = useState<BasicUserInfo | null>(null);
-  const currentUser = auth.currentUser;
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userData = await getAdditionalUserData(user.uid);
+        setCurrentUserFirebase(userData);
+      }
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleNavigation = (segment?: string) => {
     if (!segment) return;
     navigate(`/${segment}`);
   };
 
-  const filteredNavigation = NAVIGATION.filter(
-    (item) => !item.adminOnly || (currentUserFirebase?.isAdmin === true)
-  );
-
- 
-
-React.useEffect(() => {
-  const fetchUserData = async () => {
-    if (currentUser) {
-      const userData = await getAdditionalUserData(currentUser.uid);
-      setCurrentUserFirebase(userData);
-    }
-  };
-
-  fetchUserData();
-}, [currentUser]);
-
+  const navigationItems = React.useMemo(() => {
+    if (isLoading) return BASE_NAVIGATION;
+    return currentUserFirebase?.isAdmin
+      ? [...BASE_NAVIGATION, ...ADMIN_NAVIGATION]
+      : BASE_NAVIGATION;
+  }, [currentUserFirebase, isLoading]);
 
   return (
     <StyledDrawer variant="permanent" open={open} PaperProps={{ style: { position: "relative" } }}>
@@ -120,7 +122,7 @@ React.useEffect(() => {
       </DrawerHeader>
       <Divider />
       <List>
-        {filteredNavigation.map((item) => {
+        {navigationItems.map((item) => {
           const isActive = location.pathname.includes(item.segment);
           return (
             <ListItem key={item.segment} disablePadding>

@@ -8,11 +8,12 @@ const GlobalSnackbar = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
   useEffect(() => {
-    if (location.state?.message) {
-      setSnackbarMessage(location.state.message);
+    const message = location.state?.message || window.history.state?.usr?.message;
+    if (message) {
+      setSnackbarMessage(message);
       setSnackbarOpen(true);
 
-      window.history.replaceState({}, "");
+      window.history.replaceState({ ...window.history.state, usr: null }, "");
     }
   }, [location]);
 
