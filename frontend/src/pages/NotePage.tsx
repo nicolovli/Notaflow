@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { addNoteRating, getNote, hasUserRatedNote, incrementNoteViewCount } from "../firebase/func/notes";
-import { Note, NoteRating } from "../firebase/interfaces/interface.notes";
+import { addComment, addNoteRating, getNote, hasUserRatedNote, incrementNoteViewCount } from "../firebase/func/notes";
+import { Note, NoteComment, NoteRating } from "../firebase/interfaces/interface.notes";
 import { getSubject } from "../firebase/func/subject";
 import { Subject } from "../firebase/interfaces/interface.subject";
-import { CircularProgress, Alert, Tooltip, Typography, Chip, Rating, Box } from "@mui/material";
+import { CircularProgress, Alert, Tooltip, Typography, Chip, Rating, Box, TextField, Button, Card, CardContent } from "@mui/material";
 import { addFavorite, removeFavorite, isFavorite } from "../firebase/func/favorites";
 import { getAverageRating } from "../firebase/func/notes";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -13,6 +13,9 @@ import StarIcon from '@mui/icons-material/Star';
 import RatingPopup from "../components/FloatingRatingBox";
 import "../assets/style.css";
 import { auth } from "../Config/firebase-config";
+
+
+
 
 export const NotePage: React.FC = () => {
   const { id } = useParams();
@@ -25,6 +28,9 @@ export const NotePage: React.FC = () => {
   const [ratingOpen, setRatingOpen] = useState(false);
   const [averageRating, setAverageRating] = useState<number>(0);
   const [hasUserRated, setHasUserRated] = useState<boolean>(true);
+  const [question, setQuestion] = useState("");
+  const [comment, setComment] = useState("");
+  
 
 
   useEffect(() => {
@@ -91,6 +97,22 @@ export const NotePage: React.FC = () => {
     setAverageRating(getAverageRating(note.note_ratings));
     setRatingOpen(false);
   };
+
+  const handleSaveComment = async (newComment: string) => {
+    
+    if (!note || !auth.currentUser)
+      throw new Error("Not logged in or no note")
+
+    const NoteComment: NoteComment = {
+      comment: newComment,
+      comment_by_uid: auth.currentUser.uid,
+      date: new Date()
+    };
+    await addComment(note.id, NoteComment);
+    note.note_comments.push(NoteComment);
+    setComment("");
+    
+  }
 
   if (isLoading) {
     return (
@@ -242,13 +264,62 @@ export const NotePage: React.FC = () => {
           dangerouslySetInnerHTML={{ __html: note.content }}
         />
         </div>
+
+        
       </div>
-    </div>
-  );
-  }
-};
+      <Card className="w-full max-w-2xl mt-6 shadow-lg rounded-2xl border border-gray-200">
+      <CardContent className="p-6 space-y-4">
+        {/* Tittel */}
+        <Typography variant="h6" className="text-gray-900 font-semibold">
+          Kommentarer
+        </Typography>
+
+        {/* Input-felt */}
+        <TextField
+          fullWidth
+          variant="outlined"
+          placeholder="Skriv en kommentar..."
+          value={comment}
+          sx={{ "& fieldset": { border: "none" } }}
+          onChange={(e) => setComment(e.target.value)}
+          multiline
+          rows={3}
+          className="rounded-lg"
+        />
+
+        {/* Publiser-knapp */}
+        <div className="flex justify-end">
+          <Button
+            variant="contained"
+            onClick={() => handleSaveComment(comment)}
+            sx={{
+              backgroundColor: "#2563eb",
+              color: "white",
+              fontWeight: "medium",
+              paddingX: 3,
+              paddingY: 1,
+              borderRadius: "8px",
+              minWidth: "120px",
+              textTransform: "none",
+              '&:hover': { backgroundColor: "#1e40af" },
+            }}
+          >
+            Publiser
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+        
+
+      </div>
+    
+  
+  )};
+        }
+
 
 export default NotePage;
 
 
 
+        
