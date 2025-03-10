@@ -166,12 +166,12 @@ export const addNoteRating = async (note_id: string, note_rating: NoteRating): P
   }
 };
 
-export const addComment = async (note_id: string, note_comment: NoteComment): Promise<void> => {
+export const addComment = async (note_id: string, note_comments: NoteComment): Promise<void> => {
   try {
     const noteRef = doc (db,"notes", note_id)
       
     await updateDoc(noteRef, {
-      note_comment: arrayUnion(note_comment)
+      note_comments: arrayUnion(note_comments)
     });
   } catch (error) {
     console.error("Error adding comment:", error);

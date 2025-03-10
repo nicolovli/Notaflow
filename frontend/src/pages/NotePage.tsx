@@ -13,9 +13,9 @@ import StarIcon from '@mui/icons-material/Star';
 import RatingPopup from "../components/FloatingRatingBox";
 import "../assets/style.css";
 import { auth } from "../Config/firebase-config";
-
-
-
+import { getAdditionalUserData } from "../firebase/func/user";
+import { BasicUserInfo } from "../firebase/interfaces/interface.userInfo";
+import Divider from '@mui/material/Divider';
 
 export const NotePage: React.FC = () => {
   const { id } = useParams();
@@ -28,11 +28,9 @@ export const NotePage: React.FC = () => {
   const [ratingOpen, setRatingOpen] = useState(false);
   const [averageRating, setAverageRating] = useState<number>(0);
   const [hasUserRated, setHasUserRated] = useState<boolean>(true);
-  const [question, setQuestion] = useState("");
   const [comment, setComment] = useState("");
+  const [commentUser, setCommentUser] = useState<{ [uid: string]: BasicUserInfo }>({});
   
-
-
   useEffect(() => {
     const fetchAll = async () => {
       try {
@@ -61,6 +59,24 @@ export const NotePage: React.FC = () => {
           setIsNoteFavorite(_notefav);
 
           incrementNoteViewCount(id); // increment because user can now view page
+
+          // Fetch user info for comment owners
+          if (_note.note_comments && _note.note_comments.length > 0) {
+            const uniqueUserIds = Array.from(
+              new Set(_note.note_comments.map((c) => c.comment_by_uid))
+            );
+  
+            // Fire off parallel requests
+            const userPromises = uniqueUserIds.map((u) => getAdditionalUserData(u));
+            const users = await Promise.all(userPromises);
+  
+            // Build a lookup dictionary { [uid]: BasicUserInfo }
+            const userMap: { [uid: string]: BasicUserInfo } = {};
+            users.forEach((userInfo) => {
+              userMap[userInfo.id] = userInfo;
+            });
+            setCommentUser(userMap);
+          }
         }
       } catch (err) {
         console.error(err);
@@ -104,14 +120,23 @@ export const NotePage: React.FC = () => {
       throw new Error("Not logged in or no note")
 
     const NoteComment: NoteComment = {
-      comment: newComment,
+      comment: newComment.trim(),
       comment_by_uid: auth.currentUser.uid,
       date: new Date()
     };
-    await addComment(note.id, NoteComment);
-    note.note_comments.push(NoteComment);
-    setComment("");
-    
+
+    if (NoteComment.comment.length > 0 || NoteComment.comment == null) {
+      await addComment(note.id, NoteComment);
+      note.note_comments.push(NoteComment);
+      setComment("");
+    }
+
+    // If the comment’s user wasn’t already in commentUsers, fetch and store
+    const commentOwnerUid = NoteComment.comment_by_uid;
+    if (!commentUser[commentOwnerUid]) {
+      const fetchedUser = await getAdditionalUserData(commentOwnerUid);
+      setCommentUser((prev) => ({ ...prev, [fetchedUser.id]: fetchedUser }));
+    }
   }
 
   if (isLoading) {
@@ -264,58 +289,95 @@ export const NotePage: React.FC = () => {
           dangerouslySetInnerHTML={{ __html: note.content }}
         />
         </div>
-
-        
       </div>
-      <Card className="w-full max-w-2xl mt-6 shadow-lg rounded-2xl border border-gray-200">
-      <CardContent className="p-6 space-y-4">
-        {/* Tittel */}
-        <Typography variant="h6" className="text-gray-900 font-semibold">
-          Kommentarer
-        </Typography>
 
-        {/* Input-felt */}
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="Skriv en kommentar..."
-          value={comment}
-          sx={{ "& fieldset": { border: "none" } }}
-          onChange={(e) => setComment(e.target.value)}
-          multiline
-          rows={3}
-          className="rounded-lg"
-        />
+      <div
+        style={{
+          marginLeft: 20,
+          marginRight: 20,
+          marginBottom: 20,
+          boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px",
+          borderRadius: 20
+        }}
+       className="relative max-w-3xl w-full p-20 h-full font-sans bg-white overflow-hidden">
+        <Card className="w-full shadow-lg rounded-2xl border border-gray-200">
+          <CardContent className="p-6 space-y-4">
+            {/* Tittel */}
+            <Typography variant="h5" className="text-gray-900 font-semibold">
+              Kommenter notat
+            </Typography>
+            <Divider/>
 
-        {/* Publiser-knapp */}
-        <div className="flex justify-end">
-          <Button
-            variant="contained"
-            onClick={() => handleSaveComment(comment)}
-            sx={{
-              backgroundColor: "#2563eb",
-              color: "white",
-              fontWeight: "medium",
-              paddingX: 3,
-              paddingY: 1,
-              borderRadius: "8px",
-              minWidth: "120px",
-              textTransform: "none",
-              '&:hover': { backgroundColor: "#1e40af" },
-            }}
-          >
-            Publiser
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+            {/* Input-felt */}
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Skriv en kommentar..."
+              value={comment}
+              sx={{ "& fieldset": { border: "none" } }}
+              onChange={(e) => setComment(e.target.value)}
+              multiline
+              rows={3}
+              className="rounded-lg"
+            />
+
+            {/* Publiser-knapp */}
+            <div className="flex justify-end">
+              <Button
+                variant="contained"
+                onClick={() => handleSaveComment(comment)}
+                sx={{
+                  backgroundColor: "#2563eb",
+                  color: "white",
+                  fontWeight: "medium",
+                  paddingX: 3,
+                  paddingY: 1,
+                  borderRadius: "8px",
+                  minWidth: "120px",
+                  textTransform: "none",
+                  '&:hover': { backgroundColor: "#1e40af" },
+                }}
+              >
+                Publiser
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
         
-
+        {/* List of existing comments */}
+        <CardContent>
+            {note.note_comments && note.note_comments.length > 0 ? (
+              note.note_comments.map((c, idx) => {
+                const owner = commentUser[c.comment_by_uid]; 
+                return (
+                  <Card key={idx} sx={{ mb: 2, boxShadow: 1 }}>
+                    <CardContent>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+                        {owner
+                          ? `${owner.firstName} ${owner.lastName}`
+                          : "Loading user..."}
+                      </Typography>
+                      <Divider/>
+                      <Typography variant="body2" sx={{ mt: 1 }}>
+                        {c.comment}
+                      </Typography>
+                      <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                        {new Date(c.date).toLocaleString()}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                );
+              })
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                Ingen kommentarer ennå.
+              </Typography>
+            )}
+          </CardContent>
       </div>
-    
-  
+      </div>
   )};
-        }
+}
 
 
 export default NotePage;
