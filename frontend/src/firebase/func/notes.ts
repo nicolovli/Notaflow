@@ -12,6 +12,7 @@ import {
     increment,
     orderBy,
     limit,
+    Timestamp,
 } from "firebase/firestore";
 import { db } from "../../Config/firebase-config";
 import {
@@ -78,16 +79,30 @@ export const getNote = async (note_id: string): Promise<Note> => {
     try {
         const noteRef = doc(db, "notes", note_id);
         const noteSnap = await getDoc(noteRef);
+
         if (!noteSnap.exists()) {
             throw new Error(`Subject with ID ${note_id} not found`);
         }
+
         const data = noteSnap.data();
+        const rawComments = (data.note_comments || []) as {
+          comment: string;
+          comment_by_uid: string;
+          date: Timestamp;
+        }[];
+
+        const convertedComments = rawComments.map(comm => ({
+          ...comm,
+          date: comm.date.toDate(), // now it's a JS Date
+        }));
+        
+
         return {
             id: noteSnap.id,
             ...data,
             date: data.date?.toDate(),
             note_ratings: data.note_ratings || [],
-            note_comments: data.note_comments || [],
+            note_comments: convertedComments,
     } as Note;
     } catch (error) {
         console.error("Error fetching subject:", error);

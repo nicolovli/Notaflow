@@ -362,7 +362,7 @@ export const NotePage: React.FC = () => {
                         {c.comment}
                       </Typography>
                       <Typography variant="caption" display="block" sx={{ mt: 1 }}>
-                        {new Date(c.date).toLocaleString()}
+                        {c.date.toLocaleString()}
                       </Typography>
                     </CardContent>
                   </Card>
