@@ -32,7 +32,6 @@ export const stringToAccessPolicyType = (policy: string): AccessPolicyType => {
 
 export interface NoteAccessPolicy {
   type: string;
-  allowed_users?: string[];
   allowed_groups?: string[];
 }
 
@@ -54,8 +53,7 @@ export interface CreateNoteInput {
   subject_id: string;
   title: string;
   content: string;
-  access_policy?: AccessPolicyType;
-  allowed_users?: string[]; // Only used when access_policy is GROUP/PUBLIC
+  access_policy: AccessPolicyType;
   allowed_groups?: string[]; // Only used when access_policy is GROUP/PUBLIC
 }
 
