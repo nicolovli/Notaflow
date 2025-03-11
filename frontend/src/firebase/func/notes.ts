@@ -12,6 +12,7 @@ import {
     increment,
     orderBy,
     limit,
+    Timestamp,
 } from "firebase/firestore";
 import { db } from "../../Config/firebase-config";
 import {
@@ -21,6 +22,7 @@ import {
     CreateNoteInput,
     NoteRating,
     stringToAccessPolicyType,
+    NoteComment,
 } from "../interfaces/interface.notes";
 import { isUserMemberOfGroup } from "./groups";
 
@@ -35,14 +37,22 @@ export const createNote = async (input: CreateNoteInput): Promise<string> => {
       access_policy: {
         type: accessPolicyTypeToString(input.access_policy!),
         ...((input.access_policy === AccessPolicyType.GROUP ||
-          input.access_policy === AccessPolicyType.PUBLIC) && {
+            input.access_policy === AccessPolicyType.PUBLIC) && {
           allowed_users: input.allowed_users || [],
           allowed_groups: input.allowed_groups || [],
         }),
       },
       note_ratings: [],
+      note_comments: [],
       view_counter: 0,
     };
+    const noteRef = await addDoc(collection(db, "notes"), noteData);
+    return noteRef.id;
+  } catch (error) {
+    console.error("Error creating note:", error);
+    throw error;
+  }
+};
     
 export const getNotesBySubject = async (subject_id: string): Promise<Note[]> => {
     try {
@@ -69,16 +79,31 @@ export const getNote = async (note_id: string): Promise<Note> => {
     try {
         const noteRef = doc(db, "notes", note_id);
         const noteSnap = await getDoc(noteRef);
+
         if (!noteSnap.exists()) {
             throw new Error(`Subject with ID ${note_id} not found`);
         }
+
         const data = noteSnap.data();
+        const rawComments = (data.note_comments || []) as {
+          comment: string;
+          comment_by_uid: string;
+          date: Timestamp;
+        }[];
+
+        const convertedComments = rawComments.map(comm => ({
+          ...comm,
+          date: comm.date.toDate(), // now it's a JS Date
+        }));
+        
+
         return {
             id: noteSnap.id,
             ...data,
             date: data.date?.toDate(),
             note_ratings: data.note_ratings || [],
-        } as Note;
+            note_comments: convertedComments,
+    } as Note;
     } catch (error) {
         console.error("Error fetching subject:", error);
         throw error;
@@ -97,7 +122,8 @@ export const getUserNotes = async (user_id: string): Promise<Note[]> => {
                 ...data,
                 date: data.date?.toDate(),
                 note_ratings: data.note_ratings || [],
-            };
+                note_comments: data.note_comments || [],
+      };
         }) as Note[];
         return notes;
     } catch (error) {
@@ -187,6 +213,19 @@ export const addNoteRating = async (note_id: string, note_rating: NoteRating): P
     }
 };
 
+export const addComment = async (note_id: string, note_comments: NoteComment): Promise<void> => {
+  try {
+    const noteRef = doc (db,"notes", note_id)
+      
+    await updateDoc(noteRef, {
+      note_comments: arrayUnion(note_comments)
+    });
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    throw error;
+  }
+}
+
 export const hasUserRatedNote = (user_id: string, note_ratings: NoteRating[]): boolean => {
     return note_ratings.map((n) => n.rated_by_uid).includes(user_id);
 };
@@ -238,3 +277,4 @@ export const getMostViewedNotes = async (i: number): Promise<Note[]> => {
         throw error;
     }
 };
+  
