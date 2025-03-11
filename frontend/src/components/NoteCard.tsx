@@ -38,19 +38,18 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
-
   const [currentUserFirebase, setCurrentUserFirebase] = useState<BasicUserInfo | null>(null);
 
-useEffect(() => {
-  const fetchUserData = async () => {
-    if (currentUser) {
-      const userData = await getAdditionalUserData(currentUser.uid);
-      setCurrentUserFirebase(userData);
-    }
-  };
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (currentUser) {
+        const userData = await getAdditionalUserData(currentUser.uid);
+        setCurrentUserFirebase(userData);
+      }
+    };
 
-  fetchUserData();
-}, [currentUser]);
+    fetchUserData();
+  }, [currentUser]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -85,7 +84,10 @@ useEffect(() => {
   const handleDelete = async () => {
     try {
       await deleteNote(note.id);
-      navigate(+0, { state: { message: "Notatet er slettet!" } });
+      window.history.replaceState(
+        { ...window.history.state, usr: { message: "Notatet er slettet!" } },
+        ""
+      );
       onDelete(note.id);
     } catch (err) {
       console.error("Failed to delete note:", err);
@@ -126,7 +128,10 @@ useEffect(() => {
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
             onClick={(e) => e.stopPropagation()}>
-            <MenuItem onClick={handleEdit}>Rediger</MenuItem>
+            {currentUserFirebase?.isAdmin === false ||
+            (currentUser?.uid === note.user_id) === true ? (
+              <MenuItem onClick={handleEdit}>Rediger</MenuItem>
+            ) : null}
             <MenuItem onClick={() => setOpen(true)}>Slett</MenuItem>
           </Menu>
         </>

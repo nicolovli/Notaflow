@@ -1,4 +1,4 @@
-import { collection, addDoc, doc, getDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, doc, getDoc, getDocs, deleteDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../Config/firebase-config";
 import { CreateSubject, Subject } from "../interfaces/interface.subject";
 
@@ -47,6 +47,43 @@ export const getAllSubjects = async (): Promise<Subject[]> => {
     return subjects;
   } catch (error) {
     console.error("Error fetching subjects:", error);
+    throw error;
+  }
+};
+
+export const deleteSubject = async (subjectId: string): Promise<void> => {
+  try {
+    const subjectRef = doc(db, "subjects", subjectId);
+    const subjectSnap = await getDoc(subjectRef);
+
+    if (!subjectSnap.exists()) {
+      throw new Error(`Subject with ID ${subjectId} not found`);
+    }
+
+    await deleteDoc(subjectRef);
+    console.log(`Subject with ID ${subjectId} deleted successfully`);
+  } catch (error) {
+    console.error("Error deleting subject:", error);
+    throw error;
+  }
+};
+
+export const updateSubject = async (
+  subjectId: string,
+  updatedData: Partial<CreateSubject>
+): Promise<void> => {
+  try {
+    const subjectRef = doc(db, "subjects", subjectId);
+    const subjectSnap = await getDoc(subjectRef);
+
+    if (!subjectSnap.exists()) {
+      throw new Error(`Subject with ID ${subjectId} not found`);
+    }
+
+    await updateDoc(subjectRef, updatedData);
+    console.log(`Subject with ID ${subjectId} updated successfully`);
+  } catch (error) {
+    console.error("Error updating subject:", error);
     throw error;
   }
 };

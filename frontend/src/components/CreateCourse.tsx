@@ -1,19 +1,63 @@
 import { useState, useEffect } from "react";
-import { createSubject } from "../firebase/func/subject";
+import { createSubject, updateSubject, getSubject } from "../firebase/func/subject";
 import { CreateSubject } from "../firebase/interfaces/interface.subject";
-import { TextField, Alert } from "@mui/material";
+import { TextField, CircularProgress, Alert } from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
+import { auth } from "../Config/firebase-config";
+import { getAdditionalUserData } from "../firebase/func/user";
 
 const CreateCourse = () => {
+  const { id: courseId } = useParams();
+  const navigate = useNavigate();
+
   const [courseName, setCourseName] = useState("");
   const [courseCode, setCourseCode] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [isFetching, setIsFetching] = useState(!!courseId);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loadedAdminStatus, setLoadedAdminStatus] = useState(false);
 
   // Error states
   const [nameError, setNameError] = useState<string | null>(null);
   const [codeError, setCodeError] = useState<string | null>(null);
   const [descriptionError, setDescriptionError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        if (auth.currentUser) {
+          const userData = await getAdditionalUserData(auth.currentUser.uid);
+          setLoadedAdminStatus(true);
+          setIsAdmin(userData?.isAdmin || false);
+        } else {
+          setIsAdmin(false);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setIsAdmin(false);
+      }
+    };
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    if (courseId) {
+      setIsFetching(true);
+      getSubject(courseId)
+        .then((course) => {
+          setCourseName(course.name);
+          setCourseCode(course.subject_code);
+          setDescription(course.description);
+        })
+        .catch((error) => console.error("Error fetching course:", error))
+        .finally(() => setIsFetching(false));
+    }
+  }, [courseId]);
+
+  if (isAdmin === false && loadedAdminStatus) {
+    return <Alert severity="error">Du har ikke tilgang til å redigere eller opprette fag.</Alert>;
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,18 +91,19 @@ const CreateCourse = () => {
     setLoading(true);
 
     try {
-      const newCourse: CreateSubject = {
+      const courseData: CreateSubject = {
         name: courseName,
         subject_code: courseCode,
         description,
       };
 
-      await createSubject(newCourse);
-
-      setSuccessMessage("Kurset har blitt opprettet!");
-      setCourseName("");
-      setCourseCode("");
-      setDescription("");
+      if (courseId) {
+        await updateSubject(courseId, courseData);
+        navigate("/", { state: { message: "Faget er oppdatert!" } });
+      } else {
+        await createSubject(courseData);
+        navigate("/", { state: { message: "Faget har blitt opprettet" } });
+      }
     } catch (error) {
       console.error("Error creating course:", error);
     } finally {
@@ -66,21 +111,61 @@ const CreateCourse = () => {
     }
   };
 
-  useEffect(() => {
-    if (successMessage) {
-      const timer = setTimeout(() => setSuccessMessage(null), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [successMessage]);
+  if (isFetching) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          backgroundColor: "#f3f4f6",
+        }}>
+        <CircularProgress />
+      </div>
+    );
+  }
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", backgroundColor: "#f3f4f6" }}>
-      <div style={{ width: "100%", maxWidth: "600px", padding: "20px", backgroundColor: "white", borderRadius: "10px", boxShadow: "0 0 10px rgba(0,0,0,0.1)" }}>
-        <h2 style={{ fontSize: "20px", fontWeight: "bold", marginBottom: "15px", fontFamily: "sans-serif" }}>Opprett et nytt kurs!</h2>
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-          
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh",
+        backgroundColor: "#f3f4f6",
+      }}>
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "600px",
+          padding: "20px",
+          backgroundColor: "white",
+          borderRadius: "10px",
+          boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+        }}>
+        <h2
+          style={{
+            fontSize: "20px",
+            fontWeight: "bold",
+            marginBottom: "15px",
+            fontFamily: "sans-serif",
+          }}>
+          {courseId ? "Rediger kurs" : "Opprett et nytt kurs!"}
+        </h2>
+        <form
+          onSubmit={handleSubmit}
+          style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
           <div>
-            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", fontFamily: "sans-serif" }}>Kursnavn</label>
+            <label
+              style={{
+                display: "block",
+                fontSize: "14px",
+                fontWeight: "500",
+                fontFamily: "sans-serif",
+              }}>
+              Kursnavn
+            </label>
             <TextField
               type="text"
               value={courseName}
@@ -93,7 +178,15 @@ const CreateCourse = () => {
           </div>
 
           <div>
-            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", fontFamily: "sans-serif" }}>Kurskode</label>
+            <label
+              style={{
+                display: "block",
+                fontSize: "14px",
+                fontWeight: "500",
+                fontFamily: "sans-serif",
+              }}>
+              Kurskode
+            </label>
             <TextField
               type="text"
               value={courseCode}
@@ -106,7 +199,15 @@ const CreateCourse = () => {
           </div>
 
           <div>
-            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", fontFamily: "sans-serif" }}>Beskrivelse</label>
+            <label
+              style={{
+                display: "block",
+                fontSize: "14px",
+                fontWeight: "500",
+                fontFamily: "sans-serif",
+              }}>
+              Beskrivelse
+            </label>
             <TextField
               multiline
               minRows={3}
@@ -123,12 +224,17 @@ const CreateCourse = () => {
             type="submit"
             onClick={onSubmit}
             disabled={loading}
-            style={{ width: "100%", padding: "10px", backgroundColor: "#007BFF", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}
-          >
-            {loading ? "Oppretter..." : "Opprett kurs"}
+            style={{
+              width: "100%",
+              padding: "10px",
+              backgroundColor: "#007BFF",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}>
+            {loading ? "Lagrer..." : courseId ? "Oppdater kurs" : "Opprett kurs"}
           </button>
-
-          {successMessage && <Alert severity="success">{successMessage}</Alert>}
         </form>
       </div>
     </div>
