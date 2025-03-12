@@ -7,10 +7,14 @@ import { CreateNoteInput } from "../firebase/interfaces/interface.notes";
 import { auth } from "../Config/firebase-config";
 // import { stringToAccessPolicyType } from "../firebase/interfaces/interface.notes";
 import { AccessPolicyType } from "../firebase/interfaces/interface.notes";
-import CourseSelector from "./courseSelector";
 import { Subject } from "../firebase/interfaces/interface.subject";
+import { Category } from "../firebase/interfaces/interface.category";
 import { TextField, CircularProgress } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
+import CategorySelector from "./CategorySelector";
+import CourseSelector from "./courseSelector";
+import ThemeField from "./ThemeField";
+
 
 const FormComponent = () => {
   const { id: noteId } = useParams();
@@ -22,6 +26,8 @@ const FormComponent = () => {
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [resetKey, setResetKey] = useState(0);
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
+  const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
 
   //Error fields
   const [titleError, setTitleError] = useState<string | null>(null);
@@ -35,6 +41,8 @@ const FormComponent = () => {
       setText("");
       setSelectedSubject(null);
       setResetKey((prev) => prev + 1);
+      setSelectedCategories([]);
+      setSelectedThemes([]);
       return;
     }
     setLoading(true);
@@ -42,13 +50,13 @@ const FormComponent = () => {
       .then(async (note) => {
         setTitle(note.title);
         setText(note.content);
+        setSelectedThemes(note.theme);
         // setOption(note.access_policy.type);
 
         try {
           const subject = await getSubject(note.subject_id);
           setSelectedSubject(subject);
           setLoading(false);
-          // console.log(subject);
         } catch (error) {
           console.error("Kunne ikke hente faget:", error);
         }
@@ -56,7 +64,7 @@ const FormComponent = () => {
       .catch((error) => {
         console.error("Error fetching note:", error);
       })
-      .finally(() => {});
+      .finally(() => { });
   }, [noteId]);
 
   // const handleSubmit = (e: React.FormEvent) => {
@@ -112,6 +120,8 @@ const FormComponent = () => {
       subject_id: selectedSubject?.id ?? "empty",
       title: title,
       content: text,
+      tag: selectedCategories.map((category) => category.id),
+      theme: selectedThemes,
       access_policy: AccessPolicyType.PUBLIC, // Setter en standardverdi for å unngå feil
       // access_policy: stringToAccessPolicyType(option),
     };
@@ -129,6 +139,7 @@ const FormComponent = () => {
       // setOption("public");
       setText("");
       setSelectedSubject(null);
+      setSelectedCategories([]);
       setResetKey(resetKey + 1);
     } catch (error) {
       console.error("Error saving note:", error);
@@ -229,7 +240,31 @@ const FormComponent = () => {
                   </p>
                 )}
               </div>
+              <div className="flex">
+                <div style={{ display: "flex", flexDirection: "column", width: "50%" }}>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: "500" }}>
+                    Kategori
+                  </label>
+                  <div style={{ borderRadius: "5px", fontFamily: "sans-serif", marginRight: "20px", marginBottom: "10px" }}>
+                    <CategorySelector
+                      key={resetKey}
+                      onCategorySelect={setSelectedCategories}
+                      selectedCategories={selectedCategories}
+                    />
+                  </div>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", width: "50%" }}>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: "500" }}>
+                    Tema
+                  </label>
+                  <ThemeField
+                    onThemeChange={setSelectedThemes}
+                    selectedThemes={selectedThemes}
+                  />
+                </div>
 
+
+              </div>
               {/* <div>
             <label style={{ display: "block", fontSize: "14px", fontWeight: "500", fontFamily: "sans-serif" }}>Tilgjengelighet</label>
             <select
@@ -257,6 +292,8 @@ const FormComponent = () => {
                     backgroundColor: "white",
                     border: textError ? "1px solid red" : "1px solid #ccc",
                     borderRadius: "5px",
+                    height: "200px",
+                    overflow: "auto",
                   }}
                 />
                 {textError && (
