@@ -34,14 +34,15 @@ export const createNote = async (input: CreateNoteInput): Promise<string> => {
       title: input.title,
       content: input.content,
       date: new Date(),
+      tag: input.tag,
+      theme: input.theme,
       access_policy: {
         type: accessPolicyTypeToString(input.access_policy!),
         ...((input.access_policy === AccessPolicyType.GROUP ||
             input.access_policy === AccessPolicyType.PUBLIC) && {
           allowed_users: input.allowed_users || [],
           allowed_groups: input.allowed_groups || [],
-        }),
-      },
+        }),      },
       note_ratings: [],
       note_comments: [],
       view_counter: 0,

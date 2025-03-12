@@ -46,6 +46,8 @@ export interface Note {
   note_ratings: NoteRating[];
   note_comments: NoteComment[];
   view_counter: number;
+  tag: string[];
+  theme: string[];
 }
 
 // Types for the create note input
@@ -57,6 +59,8 @@ export interface CreateNoteInput {
   access_policy: AccessPolicyType;
   allowed_groups?: string[]; 
   allowed_users?: string[]; 
+  tag: string[];
+  theme: string[];
 }
 
 export interface NoteRating {
