@@ -7,6 +7,7 @@ import { Note } from "../firebase/interfaces/interface.notes";
 import { Subject } from "../firebase/interfaces/interface.subject";
 import NoteCard from "../components/NoteCard";
 import { getSubject } from "../firebase/func/subject";
+import SearchBar from "../components/SearchBar";
 
 export const CourseDetailPage: React.FC = () => {
     const { id } = useParams(); 
@@ -20,6 +21,9 @@ export const CourseDetailPage: React.FC = () => {
     const [notes, setNotes] = useState<Note[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [filteredNotes, setFilteredNotes] = useState<Note[]>(notes);
+    const [searchTerm, setSearchTerm] = useState<string>("")
+    
     
     useEffect(() => {
       const fetchSubjects = async () => {
@@ -31,8 +35,8 @@ export const CourseDetailPage: React.FC = () => {
           setCourse(courseData);
           const notesData = await getNotesBySubject((id ? id : ""));
           setNotes(notesData);
+          setFilteredNotes(notesData);
           // sort
-          
         } catch (err) {
           setError(err instanceof Error ? err.message : 'Failed to fetch subjects');
         } finally {
@@ -42,18 +46,22 @@ export const CourseDetailPage: React.FC = () => {
   
       fetchSubjects();
     }, [id]);
-  
+    
+    const handleSearch = (filtered: Note[], term: string) => {
+      setFilteredNotes(filtered);
+      setSearchTerm(term);
+    };
 
     if (isLoading) { 
         return (
-            <div className="w-full h-full w flex justify-center items-center">
-              <CircularProgress />
-            </div>
+          <div className="w-full h-full w flex justify-center items-center">
+            <CircularProgress />
+          </div>
         )
     } else if(error) {
         return <Alert variant="filled" severity="error">
-                An error occured. Check you network connection
-              </Alert>
+            An error occured. Check you network connection
+          </Alert>
     } else if(!course){
       return(
         <Alert variant="filled" severity="warning">
@@ -64,26 +72,44 @@ export const CourseDetailPage: React.FC = () => {
         return (
             <div>
               <Typography variant="h4"
-                  sx={{
-                    pt: 4,
-                    textAlign: "center",
-                    fontFamily: "Roboto, sans-serif",
-                    mb: 4,
-                  }}
-                >
-                  Her kan du finne notater i faget {course.name} ({course.subject_code})
+                sx={{
+                  pt: 4,
+                  textAlign: "center",
+                  fontFamily: "Roboto, sans-serif",
+                  mb: 4,
+                }}
+              >
+                Her kan du finne notater i faget {course.name} ({course.subject_code})
               </Typography>
+              <Typography variant="h6" color="textSecondary" sx={{ mb: 4, textAlign: "center" }}>
+                <p>Finner du ikke notaten du leste i går?</p>
+                <p>Frykt ikke! Søk etter tittelen på notatet!</p>
+              </Typography>
+              <Box sx={{ mb: 5, textAlign: "center" }}>
+                <SearchBar<Note>
+                data = {notes}
+                onSearch={(filtered, term) => handleSearch(filtered, term)}
+                filterFunction={(note, term) => 
+                note.title.toLowerCase().includes(term.toLowerCase())}
+                placeholder="Søk etter tittel"
+                />
+              </Box>
               <Box sx={{ pt: 5, pr: 12, pb: 3, pl: 12 }}>
-                      <Grid container spacing={3}>
-                        {notes.map((note) => (
-                          <Grid item 
-                              xs={12}  // 1 card per row
-                              key={note.id}>
-                            <NoteCard note={note} />
-                          </Grid>
-                        ))}
-                      </Grid>
-                    </Box>
+                {filteredNotes.length === 0 && searchTerm !== "" ? (
+                  <Alert variant="filled" severity="info" sx={{mb:3}}>
+                    Ingen notater funnet med tittelen "{searchTerm}". Prøv et annet søkeord.
+                  </Alert>
+                ) : null}
+                <Grid container spacing={3}>
+                  {filteredNotes.map((note) => (
+                    <Grid item 
+                        xs={12}  // 1 card per row
+                        key={note.id}>
+                      <NoteCard note={note} />
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
             </div>
         );
     }
