@@ -1,5 +1,7 @@
 export interface Group { 
+    id: string, 
     members: string[], 
+    name: string,
     createdAt: Date,
     shared_notes: SharedNote[]
 }

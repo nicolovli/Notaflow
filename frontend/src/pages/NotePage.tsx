@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { addComment, addNoteRating, getNote, hasUserRatedNote, incrementNoteViewCount } from "../firebase/func/notes";
-import { Note, NoteComment, NoteRating } from "../firebase/interfaces/interface.notes";
+import { Note, NoteComment, NoteRating, AccessPolicyType, stringToAccessPolicyType } from "../firebase/interfaces/interface.notes";
 import { getSubject } from "../firebase/func/subject";
 import { Subject } from "../firebase/interfaces/interface.subject";
 import { CircularProgress, Alert, Tooltip, Typography, Chip, Rating, Box, TextField, Button, Card, CardContent } from "@mui/material";
 import { addFavorite, removeFavorite, isFavorite } from "../firebase/func/favorites";
 import { getAverageRating } from "../firebase/func/notes";
+import SharePopup from "../components/SharePopup";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import StarIcon from '@mui/icons-material/Star';
 import RatingPopup from "../components/FloatingRatingBox";
+import { IosShare, Star as StarIcon} from "@mui/icons-material";
 import "../assets/style.css";
 import { auth } from "../Config/firebase-config";
 import { getAdditionalUserData } from "../firebase/func/user";
@@ -28,6 +29,9 @@ export const NotePage: React.FC = () => {
   const [ratingOpen, setRatingOpen] = useState(false);
   const [averageRating, setAverageRating] = useState<number>(0);
   const [hasUserRated, setHasUserRated] = useState<boolean>(true);
+  const [shareOpen, setShareOpen] = useState<boolean>(false);
+
+
   const [comment, setComment] = useState("");
   const [commentUser, setCommentUser] = useState<{ [uid: string]: BasicUserInfo }>({});
   
@@ -163,31 +167,33 @@ export const NotePage: React.FC = () => {
       }}
     >
       <div className="flex items-center justify-center gap-4 0">
-      {uid ? (
-          <Tooltip title={isNoteFavorite ? "Remove from favorites" : "Add to favorites"}>
-          <Chip
-            icon={isNoteFavorite ? <FavoriteIcon style={{ color: 'red' }} /> : <FavoriteBorderIcon />}
-            label={isNoteFavorite ? "Remove from favorites" : "Add to favorites"}
-            onClick={handleToggleFavorite}
-            variant="outlined"
-            sx={{
-              borderRadius: '20px',
-              color: isNoteFavorite ? 'red' : 'gray',
-              borderColor: isNoteFavorite ? 'red' : 'gray',
-              '&:hover': {
-                backgroundColor: 'rgba(255, 0, 0, 0.04)',
-                cursor: 'pointer'
-              },
-              padding: '0 8px',
-              height: '36px',
-              backgroundColor: 'white',
-              boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px",
-            }}
-            aria-label={isNoteFavorite ? "remove from favorites" : "add to favorites"}
-          />
-        </Tooltip>
-        ): null}
-
+        {/* Favorites */}
+        {uid ? (
+            <Tooltip title={isNoteFavorite ? "Remove from favorites" : "Add to favorites"}>
+            <Chip
+              icon={isNoteFavorite ? <FavoriteIcon style={{ color: 'red' }} /> : <FavoriteBorderIcon style={{color: 'red'}} />}
+              label={isNoteFavorite ? "Remove from favorites" : "Add to favorites"}
+              onClick={handleToggleFavorite}
+              variant="outlined"
+              sx={{
+                borderRadius: '20px',
+                color: isNoteFavorite ? 'red' : 'gray',
+                borderColor: isNoteFavorite ? 'red' : 'gray',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 0, 0, 0.04)',
+                  cursor: 'pointer'
+                },
+                padding: '0 8px',
+                height: '36px',
+                backgroundColor: 'white',
+                boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px",
+              }}
+              aria-label={isNoteFavorite ? "remove from favorites" : "add to favorites"}
+            />
+          </Tooltip>
+          ): null}
+        {/* note rating*/}
+        {stringToAccessPolicyType(note.access_policy.type) != AccessPolicyType.PRIVATE ? (
         <Chip
           label={
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, ml: -1 }}>
@@ -227,7 +233,9 @@ export const NotePage: React.FC = () => {
           }}
           aria-label={`Average rating is ${averageRating.toFixed(1)} stars`}
         />
+        ): null}
 
+        {/* Rate note button */}
         {uid && uid != note.user_id && !hasUserRated? (
         <Tooltip title="Rate note">
           <Chip
@@ -252,10 +260,44 @@ export const NotePage: React.FC = () => {
           />
         </Tooltip>
         ): null}
+
+        {/*share*/}
+        {uid ? (
+           <Tooltip title="Share note" onClick={() => setShareOpen(!shareOpen)}>
+           <Chip
+             icon={<IosShare sx={{fontSize: 20}} style={{ color: '#3b82f6' }} />}
+             label="Share note"
+            
+             variant="outlined"
+             sx={{
+               borderRadius: '20px',
+               color: 'gray',
+               borderColor: 'gray',
+               '&:hover': {
+                 backgroundColor: 'rgba(59, 130, 246, 0.04)',
+                 cursor: 'pointer'
+               },
+               padding: '0 8px',
+               height: '36px',
+               backgroundColor: 'white',
+               boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px",
+             }}
+             aria-label="share note"
+           />
+         </Tooltip>
+        ) : null}
     </div>
 
-      {/* RatingPopup */}
-      <RatingPopup open={ratingOpen} onClose={() => setRatingOpen(false)} onSave={handleSaveRating} noteTitle={note.title} />
+    {/* Share popup */}
+    {uid? (
+      <SharePopup open={shareOpen} onClose={() => setShareOpen(false)} user_id={uid} note_id={note.id}/>
+    ) : null}
+    
+
+    {/* RatingPopup */}
+    <RatingPopup open={ratingOpen} onClose={() => setRatingOpen(false)} onSave={handleSaveRating} noteTitle={note.title} />
+    
+
     </div>
       <div
         style={{

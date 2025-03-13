@@ -23,6 +23,7 @@ import {
     NoteRating,
     stringToAccessPolicyType,
     NoteComment,
+    NoteAccessPolicy,
 } from "../interfaces/interface.notes";
 import { isUserMemberOfGroup } from "./groups";
 
@@ -40,7 +41,6 @@ export const createNote = async (input: CreateNoteInput): Promise<string> => {
         type: accessPolicyTypeToString(input.access_policy!),
         ...((input.access_policy === AccessPolicyType.GROUP ||
             input.access_policy === AccessPolicyType.PUBLIC) && {
-          allowed_users: input.allowed_users || [],
           allowed_groups: input.allowed_groups || [],
         }),      },
       note_ratings: [],
@@ -158,10 +158,37 @@ export const deleteNote = async (note_id: string): Promise<void> => {
     }
 };
 
-export const updateNote = async (note_id: string, updatedData: Partial<CreateNoteInput>): Promise<void> => {
+export const updateNote = async (note_id: string, input: Partial<CreateNoteInput>): Promise<void> => {
     try {
         const noteRef = doc(db, "notes", note_id);
-        await updateDoc(noteRef, updatedData);
+        const updatedData: Partial<Omit<Note, "id">> = {};
+        
+        if (input.subject_id !== undefined) 
+            updatedData.subject_id = input.subject_id;
+        
+        if (input.title !== undefined) 
+            updatedData.title = input.title;
+        
+        if (input.content !== undefined) 
+            updatedData.content = input.content;
+        
+        if (input.access_policy !== undefined) {
+            const accessPolicyData: NoteAccessPolicy = {
+                type: accessPolicyTypeToString(input.access_policy)
+            };
+          
+            if (input.access_policy === AccessPolicyType.GROUP || input.access_policy === AccessPolicyType.PUBLIC) {
+                if (input.allowed_groups !== undefined) {
+                    accessPolicyData.allowed_groups = input.allowed_groups;
+                }
+            }
+            updatedData.access_policy = accessPolicyData;
+        }
+        
+        if (Object.keys(updatedData).length > 0) {
+          await updateDoc(noteRef, updatedData);
+        }
+
     } catch (error) {
         console.error("Error updating note:", error);
         throw error;
@@ -186,11 +213,7 @@ export const giveGroupAccessToNote = async (note_id: string, group_id: string): 
             note.access_policy.allowed_groups = [group_id];
         }
         
-        const noteInput: CreateNoteInput = {
-            user_id: note.user_id,
-            subject_id: note.subject_id,
-            title: note.title, 
-            content: note.content,
+        const noteInput: Partial<CreateNoteInput> = {
             access_policy: stringToAccessPolicyType(note.access_policy.type),
             allowed_groups: note.access_policy.allowed_groups
         }
