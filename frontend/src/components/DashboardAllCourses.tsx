@@ -77,9 +77,14 @@ export const DashboardAllCourses: React.FC = () => {
 
         {/* Søkebar */}
         <Box sx={{ mb: 5, textAlign: "center" }}>
-          <SearchBar
-            subjects={subjects}
+          <SearchBar<Subject>
+            data = {subjects}
             onSearch={(filtered: Subject[], term: string) => handleSearch(filtered, term)}
+            filterFunction={(subject, term) => 
+              subject.subject_code.toLowerCase().includes(term.toLowerCase()) ||
+              subject.name.toLowerCase().includes(term.toLowerCase())
+            }
+            placeholder="Søk etter fag"
           />
         </Box>
         <Grid container spacing={3}>
@@ -114,10 +119,14 @@ export const DashboardAllCourses: React.FC = () => {
           Utforsk alle notater delt av engasjerte studenter på NTNU
         </Typography>
         <Box sx={{ mb: 5, textAlign: "center" }}>
-          <SearchBar
-            subjects={subjects}
+          <SearchBar<Subject>
+            data = {subjects}
             onSearch={(filtered: Subject[], term: string) => handleSearch(filtered, term)}
-          />
+            filterFunction={(subject, term) => 
+            subject.subject_code.toLowerCase().includes(term.toLowerCase()) ||
+            subject.name.toLowerCase().includes(term.toLowerCase())}
+            placeholder="Søk etter fag"
+            />
         </Box>
         <Alert variant="filled" severity="info">
           Dette faget er dessverre ikke tilgjengelig.
