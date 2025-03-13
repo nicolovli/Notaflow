@@ -1,11 +1,12 @@
-import { collection, addDoc, doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import { collection, addDoc, doc, getDoc, updateDoc, arrayUnion, query, getDocs, where } from "firebase/firestore";
 import { db } from "../../Config/firebase-config";
 import { Group, SharedNote } from "../interfaces/interface.groups";
 import { giveGroupAccessToNote } from "./notes";
 
-export const createGroup = async (members: string[]): Promise<string> => {
+export const createGroup = async (group_name: string, members: string[]): Promise<string> => {
     try {
         const group: Omit<Group, "id"> = {
+            name: group_name,
             members: members,
             createdAt: new Date(),
             shared_notes: []
@@ -63,3 +64,27 @@ export const shareNote = async (note_id: string, group_id: string, user_id: stri
         throw error; 
     }
 }
+
+export const getGroupsOfUser = async (user_id: string): Promise<Group[]> => {
+    try {
+
+      const groupsQuery = query(
+        collection(db, "groups"),
+        where("members", "array-contains", user_id)
+      );
+      
+      const querySnapshot = await getDocs(groupsQuery);
+      
+      const groups: Group[] = querySnapshot.docs.map(doc => {
+        return {
+          id: doc.id,
+          ...doc.data()
+        } as Group;
+      });
+      
+      return groups;
+    } catch (error) {
+      console.error("Error fetching user's groups: ", error);
+      throw error;
+    }
+  };

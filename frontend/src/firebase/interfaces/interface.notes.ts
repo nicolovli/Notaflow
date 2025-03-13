@@ -58,7 +58,6 @@ export interface CreateNoteInput {
   content: string;
   access_policy: AccessPolicyType;
   allowed_groups?: string[]; 
-  allowed_users?: string[]; 
   tag: string[];
   theme: string[];
 }
