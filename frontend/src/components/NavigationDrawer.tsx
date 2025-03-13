@@ -5,6 +5,7 @@ import StickyNote2Icon from "@mui/icons-material/StickyNote2";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import MenuIcon from "@mui/icons-material/Menu";
 import MuiDrawer from "@mui/material/Drawer";
+import TagIcon from "@mui/icons-material/Tag";
 import { styled, Theme, CSSObject } from "@mui/material/styles";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
@@ -80,6 +81,7 @@ const BASE_NAVIGATION = [
 
 const ADMIN_NAVIGATION = [
   { segment: "createCourse", title: "Opprett Fag", icon: <CreateNewFolderIcon /> },
+  { segment: "createCategory", title: "Opprett Kategori", icon: <TagIcon/>}
 ];
 
 const NavigationDrawer: React.FC = () => {
