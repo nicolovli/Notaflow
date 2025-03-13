@@ -14,6 +14,7 @@ import NavigationDrawer from "./components/NavigationDrawer";
 import FloatingPlusButton from "./components/FloatingPlusButton";
 import CreateCoursePage from "./pages/CreateCoursePage";
 import GlobalSnackbar from "./components/GlobalSnackBar";
+import { CreateCategoryPage } from "./pages/CreateCategoryPage";
 
 /**
  * Root component of the application.
@@ -53,6 +54,7 @@ export const App = () => {
               <Route path="/createCourse" element={<CreateCoursePage />} />
               <Route path="/publishingpage/:id" element={<PublishingPage />} />
               <Route path="/createCourse/:id" element={<CreateCoursePage />} />
+              <Route path="/createCategory" element={<CreateCategoryPage />} />
             </Route>
           </Routes>
         </div>

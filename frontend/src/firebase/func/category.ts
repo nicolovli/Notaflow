@@ -1,4 +1,4 @@
-import { collection, addDoc, doc, getDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, doc, getDoc, getDocs, updateDoc } from "firebase/firestore";
 import { db } from "../../Config/firebase-config";
 import { CreateCategory, Category } from "../interfaces/interface.category";
 
@@ -47,6 +47,26 @@ export const getAllCategory = async (): Promise<Category[]> => {
     return category;
   } catch (error) {
     console.error("Error fetching category:", error);
+    throw error;
+  }
+};
+
+export const updateCategory = async (
+  tag: string,
+  updatedData: Partial<CreateCategory>
+): Promise<void> => {
+  try {
+    const categoryRef = doc(db, "category");
+    const categorySnap = await getDoc(categoryRef);
+
+    if (!categorySnap.exists()) {
+      throw new Error(`Category with not found`);
+    }
+
+    await updateDoc(categoryRef, updatedData);
+    console.log(`Category with tag ${tag} updated successfully`);
+  } catch (error) {
+    console.error("Error updating category:", error);
     throw error;
   }
 };
