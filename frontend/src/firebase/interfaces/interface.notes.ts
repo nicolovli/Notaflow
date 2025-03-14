@@ -58,8 +58,10 @@ export interface CreateNoteInput {
   content: string;
   access_policy: AccessPolicyType;
   allowed_groups?: string[]; 
-  tag: string[];
-  theme: string[];
+  note_ratings?: NoteRating[];
+  note_comments?: NoteComment[];
+  tag?: string[];
+  theme?: string[];
 }
 
 export interface NoteRating {
