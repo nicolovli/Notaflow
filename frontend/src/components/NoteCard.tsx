@@ -23,7 +23,8 @@ import { getAdditionalUserData } from "../firebase/func/user";
 import { BasicUserInfo } from "../firebase/interfaces/interface.userInfo";
 import { auth } from "../Config/firebase-config";
 import { deleteNote } from "../firebase/func/notes";
-
+import { getAverageRating, getNote } from "../firebase/func/notes";
+import Rating from "@mui/material/Rating";
 
 interface Props {
   note: Note;
@@ -37,6 +38,7 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
   const [error, setError] = useState<string | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [open, setOpen] = useState(false);
+  const [averageRating, setAverageRating] = useState<number>(0);
   const navigate = useNavigate();
 
   const [currentUserFirebase, setCurrentUserFirebase] = useState<BasicUserInfo | null>(null);
@@ -99,8 +101,22 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
   };
 
   const containerClassName = (currentUser?.uid === note.user_id || currentUserFirebase?.isAdmin)
-    ? 'flex justify-start !mr-10'
-    : 'flex justify-start ';
+    ? 'flex justify-start !mt-1 !mr-10'
+    : 'flex justify-start !mt-1 ';
+
+  useEffect(() => {
+    const fetchNoteRating = async () => {
+      try {
+        const _note = await getNote(note.id);
+        if (_note) {
+          setAverageRating(getAverageRating(_note.note_ratings));
+        }
+      } catch (err) {
+        console.error("Error fetching rating:", err);
+      }
+    };
+    fetchNoteRating();
+  }, [note.id]);
 
   return (
     <Card
@@ -154,7 +170,7 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
         <CardContent>
           {/* Show each couse, example: "Statistikk (ISTT1003) with description" */}
           <div className="flex-col justify-between w-full">
-            <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
+            <Typography variant="h5" sx={{ fontWeight: "bold", }}>
               {note.title}
             </Typography>
             <div className={containerClassName}>
@@ -169,6 +185,25 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
                 ))
               ) : null}
             </div>
+            <div className="flex items-center gap-1 !mt-1">
+              <Typography
+                sx={{
+                  marginLeft: 0.5,
+                  marginTop: 0.5
+                }}
+                variant="body2">Rating: {averageRating.toFixed(1)}
+              </Typography>
+              <Rating
+                value={averageRating}
+                precision={0.5}
+                readOnly size="small"
+                sx={{
+                  fontSize: '0.85rem',
+                  marginLeft: 1,
+                  marginTop: 0.5
+                }} />
+            </div>
+
           </div>
           <Divider sx={{ my: 1 }} />
 
