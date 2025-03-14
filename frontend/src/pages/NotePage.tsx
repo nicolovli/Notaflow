@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { addComment, addNoteRating, getNote, hasUserRatedNote, incrementNoteViewCount } from "../firebase/func/notes";
-import { Note, NoteComment, NoteRating, AccessPolicyType, stringToAccessPolicyType } from "../firebase/interfaces/interface.notes";
+import { Note, NoteComment, NoteRating, AccessPolicyType, stringToAccessPolicyType, accessPolicyTypeToString } from "../firebase/interfaces/interface.notes";
 import { getSubject } from "../firebase/func/subject";
 import { Subject } from "../firebase/interfaces/interface.subject";
 import { CircularProgress, Alert, Tooltip, Typography, Chip, Rating, Box, TextField, Button, Card, CardContent } from "@mui/material";
@@ -17,6 +17,7 @@ import { auth } from "../Config/firebase-config";
 import { getAdditionalUserData } from "../firebase/func/user";
 import { BasicUserInfo } from "../firebase/interfaces/interface.userInfo";
 import Divider from '@mui/material/Divider';
+import { isUserMemberOfOneGroup } from "../firebase/func/groups";
 
 export const NotePage: React.FC = () => {
   const { id } = useParams();
@@ -42,6 +43,17 @@ export const NotePage: React.FC = () => {
           throw new Error("ID not set correctly");
         } else {
           const _note = await getNote(id);
+          // check access policy
+          if((_note.access_policy.type == accessPolicyTypeToString(AccessPolicyType.PRIVATE)) && (auth.currentUser?.uid !== _note.user_id)) {
+            return 
+          }
+
+          if(_note.access_policy.type == accessPolicyTypeToString(AccessPolicyType.GROUP)) {
+            if(!auth.currentUser)
+              return
+            if(!isUserMemberOfOneGroup(_note.access_policy.allowed_groups || [], auth.currentUser.uid) || _note.user_id !== auth.currentUser.uid) 
+              return
+          }
           setNote(_note);
           if(_note == null) {
             throw new Error("Error with note");
@@ -193,7 +205,7 @@ export const NotePage: React.FC = () => {
           </Tooltip>
           ): null}
         {/* note rating*/}
-        {stringToAccessPolicyType(note.access_policy.type) != AccessPolicyType.PRIVATE ? (
+        {stringToAccessPolicyType(note.access_policy.type) == AccessPolicyType.PUBLIC ? (
         <Chip
           label={
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, ml: -1 }}>
@@ -333,7 +345,9 @@ export const NotePage: React.FC = () => {
         </div>
       </div>
 
-      <div
+      {/* Comments */}
+      {stringToAccessPolicyType(note.access_policy.type) === AccessPolicyType.PUBLIC ? (
+        <div
         style={{
           marginLeft: 20,
           marginRight: 20,
@@ -341,7 +355,7 @@ export const NotePage: React.FC = () => {
           boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px",
           borderRadius: 20
         }}
-       className="relative max-w-3xl w-full p-20 h-full font-sans bg-white overflow-hidden">
+      className="relative max-w-3xl w-full p-20 h-full font-sans bg-white overflow-hidden">
         <Card className="w-full shadow-lg rounded-2xl border border-gray-200">
           <CardContent className="p-6 space-y-4">
             {/* Tittel */}
@@ -417,13 +431,10 @@ export const NotePage: React.FC = () => {
             )}
           </CardContent>
       </div>
+      ): null}
+  
       </div>
   )};
 }
 
-
 export default NotePage;
-
-
-
-        

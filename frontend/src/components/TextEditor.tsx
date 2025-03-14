@@ -5,8 +5,8 @@ import { createNote, updateNote, getNote } from "../firebase/func/notes";
 import { getSubject } from "../firebase/func/subject";
 import { CreateNoteInput } from "../firebase/interfaces/interface.notes";
 import { auth } from "../Config/firebase-config";
-// import { stringToAccessPolicyType } from "../firebase/interfaces/interface.notes";
-import { AccessPolicyType } from "../firebase/interfaces/interface.notes";
+import { stringToAccessPolicyType } from "../firebase/interfaces/interface.notes";
+//import { AccessPolicyType } from "../firebase/interfaces/interface.notes";
 import { Subject } from "../firebase/interfaces/interface.subject";
 import { Category } from "../firebase/interfaces/interface.category";
 import { TextField, CircularProgress } from "@mui/material";
@@ -21,7 +21,7 @@ const FormComponent = () => {
   const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
-  // const [option, setOption] = useState("public");
+  const [option, setOption] = useState("public");
   const [text, setText] = useState("");
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -31,7 +31,7 @@ const FormComponent = () => {
 
   //Error fields
   const [titleError, setTitleError] = useState<string | null>(null);
-  // const [optionError, setOptionError] = useState<string | null>(null);
+  const [optionError, setOptionError] = useState<string | null>(null);
   const [textError, setTextError] = useState<string | null>(null);
   const [selectedSubjectError, setSelectedSubjectError] = useState<string | null>(null);
 
@@ -50,8 +50,8 @@ const FormComponent = () => {
       .then(async (note) => {
         setTitle(note.title);
         setText(note.content);
-        setSelectedThemes(note.theme);
-        // setOption(note.access_policy.type);
+        setSelectedThemes(note.theme||[]);
+        setOption(note.access_policy.type);
 
         try {
           const subject = await getSubject(note.subject_id);
@@ -81,7 +81,7 @@ const FormComponent = () => {
 
     e.preventDefault();
 
-    // setOptionError(null);
+    setOptionError(null);
     setSelectedSubjectError(null);
     setTitleError(null);
     setTextError(null);
@@ -104,10 +104,10 @@ const FormComponent = () => {
       hasError = true;
     }
 
-    // if (!option) {
-    //   setOptionError("Du må velge en tilgjengelighet");
-    //   hasError = true;
-    // }
+    if (!option) {
+      setOptionError("Du må velge en tilgjengelighet");
+      hasError = true;
+    }
 
     //Don´t continoue if there is errors
     if (hasError) {
@@ -122,8 +122,7 @@ const FormComponent = () => {
       content: text,
       tag: selectedCategories.map((category) => category.id),
       theme: selectedThemes,
-      access_policy: AccessPolicyType.PUBLIC, // Setter en standardverdi for å unngå feil
-      // access_policy: stringToAccessPolicyType(option),
+      access_policy: stringToAccessPolicyType(option),
     };
 
     try {
@@ -136,7 +135,7 @@ const FormComponent = () => {
       }
       //Clear fields if no errors
       setTitle("");
-      // setOption("public");
+      setOption("public");
       setText("");
       setSelectedSubject(null);
       setSelectedCategories([]);
@@ -265,7 +264,7 @@ const FormComponent = () => {
 
 
               </div>
-              {/* <div>
+              <div>
             <label style={{ display: "block", fontSize: "14px", fontWeight: "500", fontFamily: "sans-serif" }}>Tilgjengelighet</label>
             <select
               value={option}
@@ -278,7 +277,7 @@ const FormComponent = () => {
               <option value="public">Offentlig</option>
             </select>
             {optionError && <p style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>{optionError}</p>}
-          </div> */}
+          </div>
 
               <div>
                 <label style={{ display: "block", fontSize: "14px", fontWeight: "500" }}>

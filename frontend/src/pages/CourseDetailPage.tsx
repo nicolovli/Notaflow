@@ -3,11 +3,12 @@ import { Box, Typography, CircularProgress, Alert } from "@mui/material";
 import Grid from "@mui/material/Grid"; 
 import { useParams } from "react-router-dom";
 import { getNotesBySubject } from "../firebase/func/notes";
-import { Note } from "../firebase/interfaces/interface.notes";
+import { AccessPolicyType, Note } from "../firebase/interfaces/interface.notes";
 import { Subject } from "../firebase/interfaces/interface.subject";
 import NoteCard from "../components/NoteCard";
 import { getSubject } from "../firebase/func/subject";
 import SearchBar from "../components/SearchBar";
+import { stringToAccessPolicyType } from "../firebase/interfaces/interface.notes";
 
 export const CourseDetailPage: React.FC = () => {
     const { id } = useParams(); 
@@ -33,7 +34,8 @@ export const CourseDetailPage: React.FC = () => {
           }
           const courseData = await getSubject((id ? id : ""));  
           setCourse(courseData);
-          const notesData = await getNotesBySubject((id ? id : ""));
+          const _notesData = await getNotesBySubject((id ? id : ""));
+          const notesData = _notesData.filter(f => stringToAccessPolicyType(f.access_policy.type) == AccessPolicyType.PUBLIC);
           setNotes(notesData);
           setFilteredNotes(notesData);
           // sort

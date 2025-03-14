@@ -38,6 +38,14 @@ export const isUserMemberOfGroup = async (group_id: string, user_id: string): Pr
       }
 }
 
+export const isUserMemberOfOneGroup = async(groups: string[], user_id: string) => {
+  for(let i =0; i < groups.length; i++) {
+    if(await isUserMemberOfGroup(groups[i], user_id))
+      return true;
+  }
+  return false; 
+}
+
 export const shareNote = async (note_id: string, group_id: string, user_id: string) => {
     try {
         const isMember = await isUserMemberOfGroup(group_id, user_id);
