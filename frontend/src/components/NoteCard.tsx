@@ -24,6 +24,7 @@ import { BasicUserInfo } from "../firebase/interfaces/interface.userInfo";
 import { auth } from "../Config/firebase-config";
 import { deleteNote } from "../firebase/func/notes";
 
+
 interface Props {
   note: Note;
   onDelete: (noteId: string) => void;
@@ -63,7 +64,6 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
         setIsLoading(false);
       }
     };
-
     fetchUser();
   }, [note]);
 
@@ -94,7 +94,13 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
     }
     handleMenuClose();
     setOpen(false);
+
+
   };
+
+  const containerClassName = (currentUser?.uid === note.user_id || currentUserFirebase?.isAdmin)
+    ? 'flex justify-start !mr-10'
+    : 'flex justify-start ';
 
   return (
     <Card
@@ -129,7 +135,7 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
             onClose={handleMenuClose}
             onClick={(e) => e.stopPropagation()}>
             {currentUserFirebase?.isAdmin === false ||
-            (currentUser?.uid === note.user_id) === true ? (
+              (currentUser?.uid === note.user_id) === true ? (
               <MenuItem onClick={handleEdit}>Rediger</MenuItem>
             ) : null}
             <MenuItem onClick={() => setOpen(true)}>Slett</MenuItem>
@@ -147,9 +153,23 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
         }}>
         <CardContent>
           {/* Show each couse, example: "Statistikk (ISTT1003) with description" */}
-          <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
-            {note.title}
-          </Typography>
+          <div className="flex-col justify-between w-full">
+            <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
+              {note.title}
+            </Typography>
+            <div className={containerClassName}>
+              {note.theme && Array.isArray(note.theme) && note.theme.length > 0 ? (
+                note.theme.map((theme, index) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center justify-center w-fit min-w-[60px] max-h-[30px] !px-2 !mr-2 rounded-full bg-purple-100 border border-purple-600 text-purple-700 text-xs font-medium"
+                  >
+                    {theme}
+                  </span>
+                ))
+              ) : null}
+            </div>
+          </div>
           <Divider sx={{ my: 1 }} />
 
           {isLoading ? (
@@ -163,6 +183,7 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
               Laget av: {userInfo?.firstName} {userInfo?.lastName}
             </Typography>
           )}
+
 
           <Typography variant="subtitle1" color="text.secondary">
             Laget: {note.date.toDateString()}
