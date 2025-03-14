@@ -27,6 +27,7 @@ import {
 } from "../interfaces/interface.notes";
 import { isUserMemberOfGroup } from "./groups";
 
+
 export const createNote = async (input: CreateNoteInput): Promise<string> => {
   try {
     const noteData: Omit<Note, "id"> = {
@@ -212,10 +213,16 @@ export const giveGroupAccessToNote = async (note_id: string, group_id: string): 
         } else {
             note.access_policy.allowed_groups = [group_id];
         }
-        
-        const noteInput: Partial<CreateNoteInput> = {
+
+        const noteInput: CreateNoteInput = {
+            user_id: note.user_id,
+            subject_id: note.subject_id,
+            title: note.title,
+            content: note.content,
             access_policy: stringToAccessPolicyType(note.access_policy.type),
-            allowed_groups: note.access_policy.allowed_groups
+            allowed_groups: note.access_policy.allowed_groups,
+            tag: [],
+            theme: []
         }
         await updateNote(note.id, noteInput);
     } catch (error) {
