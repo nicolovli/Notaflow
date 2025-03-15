@@ -188,7 +188,6 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
             <div className="flex items-center gap-1 !mt-1">
               <Typography
                 sx={{
-                  marginLeft: 0.5,
                   marginTop: 0.5
                 }}
                 variant="body2">Rating: {averageRating.toFixed(1)}

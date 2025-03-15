@@ -11,7 +11,7 @@ import SharePopup from "../components/SharePopup";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import RatingPopup from "../components/FloatingRatingBox";
-import { IosShare, Star as StarIcon} from "@mui/icons-material";
+import { IosShare, Star as StarIcon } from "@mui/icons-material";
 import "../assets/style.css";
 import { auth } from "../Config/firebase-config";
 import { getAdditionalUserData } from "../firebase/func/user";
@@ -35,7 +35,7 @@ export const NotePage: React.FC = () => {
 
   const [comment, setComment] = useState("");
   const [commentUser, setCommentUser] = useState<{ [uid: string]: BasicUserInfo }>({});
-  
+
   useEffect(() => {
     const fetchAll = async () => {
       try {
@@ -55,22 +55,22 @@ export const NotePage: React.FC = () => {
               return
           }
           setNote(_note);
-          if(_note == null) {
+          if (_note == null) {
             throw new Error("Error with note");
           }
           setAverageRating(getAverageRating(_note.note_ratings));
           const subject = await getSubject(_note.subject_id);
           setSubject(subject);
 
-      
-          const _uid = auth.currentUser?.uid; 
-          if(!_uid) { 
+
+          const _uid = auth.currentUser?.uid;
+          if (!_uid) {
             setUid(null)
-            return  
+            return
           }
           setUid(_uid);
           setHasUserRated(hasUserRatedNote(_uid, _note.note_ratings));
-          
+
           const _notefav: boolean = await isFavorite(_uid, _note.id);
           setIsNoteFavorite(_notefav);
 
@@ -81,11 +81,11 @@ export const NotePage: React.FC = () => {
             const uniqueUserIds = Array.from(
               new Set(_note.note_comments.map((c) => c.comment_by_uid))
             );
-  
+
             // Fire off parallel requests
             const userPromises = uniqueUserIds.map((u) => getAdditionalUserData(u));
             const users = await Promise.all(userPromises);
-  
+
             // Build a lookup dictionary { [uid]: BasicUserInfo }
             const userMap: { [uid: string]: BasicUserInfo } = {};
             users.forEach((userInfo) => {
@@ -100,7 +100,7 @@ export const NotePage: React.FC = () => {
       } finally {
         setIsLoading(false);
       }
-   
+
     };
     fetchAll();
 
@@ -114,7 +114,7 @@ export const NotePage: React.FC = () => {
   };
 
   const handleSaveRating = async (newRating: number) => {
-    if(!note || !auth.currentUser || hasUserRated) 
+    if (!note || !auth.currentUser || hasUserRated)
       throw new Error("Not logged in, no note or user has already rated note");
 
     const noteRating: NoteRating = {
@@ -131,7 +131,7 @@ export const NotePage: React.FC = () => {
   };
 
   const handleSaveComment = async (newComment: string) => {
-    
+
     if (!note || !auth.currentUser)
       throw new Error("Not logged in or no note")
 
@@ -169,16 +169,15 @@ export const NotePage: React.FC = () => {
     );
   } else {
     return (
-      <div 
-      className="relative flex justify-start items-center place-items-center flex-col">
+    <div className="relative flex justify-start items-center place-items-center flex-col">
            {/* Everything on right side */}
-    <div className="flex flex-col gap-4 mt-6 mb-4 relative max-w-3xl w-full p-20 h-full font-sans top-2" 
-      style={{
-        paddingBottom: 20,
-        marginBottom: 20
-      }}
-    >
-      <div className="flex items-center justify-center gap-4 0">
+      <div className="flex flex-col gap-4 mt-6 mb-4 relative max-w-3xl w-full p-20 h-full font-sans top-2" 
+        style={{
+          paddingBottom: 20,
+          marginBottom: 20
+        }}
+        >
+        <div className="flex items-center justify-center gap-4 0">
         {/* Favorites */}
         {uid ? (
             <Tooltip title={isNoteFavorite ? "Remove from favorites" : "Add to favorites"}>
@@ -202,8 +201,9 @@ export const NotePage: React.FC = () => {
               }}
               aria-label={isNoteFavorite ? "remove from favorites" : "add to favorites"}
             />
-          </Tooltip>
-          ): null}
+            </Tooltip>
+          ): null
+        }
         {/* note rating*/}
         {stringToAccessPolicyType(note.access_policy.type) == AccessPolicyType.PUBLIC ? (
         <Chip
@@ -245,7 +245,8 @@ export const NotePage: React.FC = () => {
           }}
           aria-label={`Average rating is ${averageRating.toFixed(1)} stars`}
         />
-        ): null}
+        ): null
+        }     
 
         {/* Rate note button */}
         {uid && uid != note.user_id && !hasUserRated? (
@@ -298,113 +299,139 @@ export const NotePage: React.FC = () => {
            />
          </Tooltip>
         ) : null}
-    </div>
-
-    {/* Share popup */}
-    {uid? (
-      <SharePopup open={shareOpen} onClose={() => setShareOpen(false)} user_id={uid} note_id={note.id}/>
-    ) : null}
-    
-
-    {/* RatingPopup */}
-    <RatingPopup open={ratingOpen} onClose={() => setRatingOpen(false)} onSave={handleSaveRating} noteTitle={note.title} />
-    
-
-    </div>
-      <div
-        style={{
-          marginLeft: 20,
-          marginRight: 20,
-          marginBottom: 20,
-          boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px",
-          borderRadius: 20
-        }}
-       className="relative max-w-3xl w-full p-20 h-full font-sans bg-white overflow-hidden">
-        <div 
-        style={{
-          padding: 30,
-          minHeight: 'calc(100vh - 200px)'
-        }}
-        className="p-10 w-full h-full">
-        
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">{note.title}</h1>
-        <p 
-          style={{
-            paddingBottom: 20,
-            marginBottom: 20
-          }}
-          className="text-lg text-gray-700 font-medium border-b-gray-200 border-b mb-4">
-          {subject.name} ({subject.subject_code})
-        </p>
-
-        <div
-          id="content"
-          className="prose prose-lg text-gray-800 leading-relaxed mt-6"
-          dangerouslySetInnerHTML={{ __html: note.content }}
-        />
         </div>
-      </div>
 
-      {/* Comments */}
-      {stringToAccessPolicyType(note.access_policy.type) === AccessPolicyType.PUBLIC ? (
+        {/* Share popup */}
+        {uid? (
+          <SharePopup open={shareOpen} onClose={() => setShareOpen(false)} user_id={uid} note_id={note.id}/>
+        ) : null}
+    
+
+        {/* RatingPopup */}
+        <RatingPopup open={ratingOpen} onClose={() => setRatingOpen(false)} onSave={handleSaveRating} noteTitle={note.title} />
+      
+      </div>
         <div
-        style={{
-          marginLeft: 20,
-          marginRight: 20,
-          marginBottom: 20,
-          boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px",
-          borderRadius: 20
-        }}
-      className="relative max-w-3xl w-full p-20 h-full font-sans bg-white overflow-hidden">
+          style={{
+            marginLeft: 20,
+            marginRight: 20,
+            marginBottom: 20,
+            boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px",
+            borderRadius: 20
+          }}
+          className="relative max-w-3xl w-full p-20 h-full font-sans bg-white overflow-hidden">
+          <div
+            style={{
+              padding: 30,
+              minHeight: 'calc(100vh - 200px)'
+            }}
+            className="p-10 w-full h-full">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-4">{note.title}</h1>
+              <p
+                style={{
+                  marginBottom: 5
+                }}
+                className="text-lg text-gray-700 font-medium">
+                {subject.name} ({subject.subject_code})
+              </p>
+              <div className={'flex justify-start  border-b-gray-200 border-b !pb-5 !pt-2'}>
+                {note.theme && Array.isArray(note.theme) && note.theme.length > 0 ? (
+                  note.theme.map((theme, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center justify-center w-fit min-w-[60px] max-h-[30px] !px-2 !mr-2 rounded-full bg-purple-100 border border-purple-600 text-purple-700 text-xs font-medium "
+                    >
+                      {theme}
+                    </span>
+                  ))
+                ) : null}
+              </div>
+            </div>
+            <div
+              id="content"
+              className="prose prose-lg text-gray-800 leading-relaxed mt-6"
+              dangerouslySetInnerHTML={{ __html: note.content }}
+            />
+          </div>
+        </div>
+
+        {/* <div
+          style={{
+            marginLeft: 20,
+            marginRight: 20,
+            marginBottom: 20,
+            boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px",
+            borderRadius: 20
+          }}
+          className="relative max-w-3xl w-full p-20 h-full font-sans bg-white overflow-hidden"> */}
+          {/* Comments */}
+          {stringToAccessPolicyType(note.access_policy.type) === AccessPolicyType.PUBLIC ? (
+            <div
+            style={{
+              marginLeft: 20,
+              marginRight: 20,
+              marginBottom: 20,
+              boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px",
+              borderRadius: 20
+            }}
+          className="relative max-w-3xl w-full p-20 h-full font-sans bg-white overflow-hidden">
+          <Card className="w-full shadow-lg rounded-2xl border border-gray-200">
+            <CardContent className="p-6 space-y-4">
+              {/* Tittel */}
+              <Typography variant="h5" className="text-gray-900 font-semibold">
+                Kommenter notat
+              </Typography>
+              <Divider />
+              {/* Input-felt */}
+              <TextField
+                fullWidth
+                variant="outlined"
+                placeholder="Skriv en kommentar..."
+                value={comment}
+                sx={{ "& fieldset": { border: "none" } }}
+                onChange={(e) => setComment(e.target.value)}
+                multiline
+                rows={3}
+                className="rounded-lg"
+              />
+
+      {/* className="relative max-w-3xl w-full p-20 h-full font-sans bg-white overflow-hidden">
         <Card className="w-full shadow-lg rounded-2xl border border-gray-200">
-          <CardContent className="p-6 space-y-4">
+          <CardContent className="p-6 space-y-4"> */}
             {/* Tittel */}
-            <Typography variant="h5" className="text-gray-900 font-semibold">
+            {/* <Typography variant="h5" className="text-gray-900 font-semibold">
               Kommenter notat
             </Typography>
-            <Divider/>
+            <Divider/> */}
+              {/* Publiser-knapp */}
+              <div className="flex justify-end">
+                <Button
+                  variant="contained"
+                  onClick={() => handleSaveComment(comment)}
+                  sx={{
+                    backgroundColor: "#2563eb",
+                    color: "white",
+                    fontWeight: "medium",
+                    paddingX: 3,
+                    paddingY: 1,
+                    borderRadius: "8px",
+                    minWidth: "120px",
+                    textTransform: "none",
+                    '&:hover': { backgroundColor: "#1e40af" },
+                  }}
+                >
+                  Publiser
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Input-felt */}
-            <TextField
-              fullWidth
-              variant="outlined"
-              placeholder="Skriv en kommentar..."
-              value={comment}
-              sx={{ "& fieldset": { border: "none" } }}
-              onChange={(e) => setComment(e.target.value)}
-              multiline
-              rows={3}
-              className="rounded-lg"
-            />
-
-            {/* Publiser-knapp */}
-            <div className="flex justify-end">
-              <Button
-                variant="contained"
-                onClick={() => handleSaveComment(comment)}
-                sx={{
-                  backgroundColor: "#2563eb",
-                  color: "white",
-                  fontWeight: "medium",
-                  paddingX: 3,
-                  paddingY: 1,
-                  borderRadius: "8px",
-                  minWidth: "120px",
-                  textTransform: "none",
-                  '&:hover': { backgroundColor: "#1e40af" },
-                }}
-              >
-                Publiser
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* List of existing comments */}
-        <CardContent>
+          {/* List of existing comments */}
+          <CardContent>
             {note.note_comments && note.note_comments.length > 0 ? (
               note.note_comments.map((c, idx) => {
-                const owner = commentUser[c.comment_by_uid]; 
+                const owner = commentUser[c.comment_by_uid];
                 return (
                   <Card key={idx} sx={{ mb: 2, boxShadow: 1 }}>
                     <CardContent>
@@ -413,7 +440,7 @@ export const NotePage: React.FC = () => {
                           ? `${owner.firstName} ${owner.lastName}`
                           : "Loading user..."}
                       </Typography>
-                      <Divider/>
+                      <Divider />
                       <Typography variant="body2" sx={{ mt: 1 }}>
                         {c.comment}
                       </Typography>
@@ -430,11 +457,10 @@ export const NotePage: React.FC = () => {
               </Typography>
             )}
           </CardContent>
-      </div>
+        </div>
       ): null}
-  
-      </div>
-  )};
+    </div>
+    )};
 }
 
 export default NotePage;
