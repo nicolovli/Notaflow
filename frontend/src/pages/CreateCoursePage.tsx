@@ -3,7 +3,7 @@ import CreateCourse from "../components/CreateCourse";
 
 const CreateCoursePage: React.FC = () => {
   return (
-    <div>
+    <div style={{ height: "100%" }}>
       <CreateCourse />
     </div>
   );

@@ -36,6 +36,9 @@ export interface NoteAccessPolicy {
 }
 
 export interface Note {
+  shared_date?: string;
+  shared_by?: string;
+  share_by_user_id: string;
   id: string;
   user_id: string;
   subject_id: string;
@@ -57,9 +60,10 @@ export interface CreateNoteInput {
   title: string;
   content: string;
   access_policy: AccessPolicyType;
-  allowed_groups?: string[]; 
+  allowed_groups?: string[];
   note_ratings?: NoteRating[];
   note_comments?: NoteComment[];
+  allowed_users?: string[];
   tag?: string[];
   theme?: string[];
 }

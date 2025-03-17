@@ -17,7 +17,9 @@ import {
   ListItemText,
   IconButton,
   Divider,
+  Typography,
 } from "@mui/material";
+import GroupsIcon from "@mui/icons-material/Groups";
 import { BasicUserInfo } from "../firebase/interfaces/interface.userInfo";
 import { getAdditionalUserData } from "../firebase/func/user";
 import { auth } from "../Config/firebase-config";
@@ -77,6 +79,7 @@ const BASE_NAVIGATION = [
   { segment: "Dashboard", title: "Dashboard", icon: <DashboardIcon /> },
   { segment: "myNotes", title: "Mine notater", icon: <StickyNote2Icon /> },
   { segment: "myFavoriteNotes", title: "Favoritter", icon: <FavoriteIcon /> },
+  { segment: "privateGroupPage", title: "Mine grupper", icon: <GroupsIcon /> },
 ];
 
 const ADMIN_NAVIGATION = [
@@ -118,6 +121,21 @@ const NavigationDrawer: React.FC = () => {
   return (
     <StyledDrawer variant="permanent" open={open} PaperProps={{ style: { position: "relative" } }}>
       <DrawerHeader open={open}>
+        {open ? (
+          <Typography
+            variant="h6"
+            sx={{
+              color: "grey",
+              flexGrow: 1,
+              display: "flex",
+              justifyContent: "flex-start",
+              paddingLeft: 1.5,
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+            }}>
+            Oversikt
+          </Typography>
+        ) : null}
         <IconButton onClick={() => setOpen(!open)}>
           {open ? <ChevronLeftIcon /> : <MenuIcon />}
         </IconButton>

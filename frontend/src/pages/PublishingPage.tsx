@@ -1,12 +1,11 @@
 import TextEditor from "../components/TextEditor";
 
-
 const PublishingPage = () => {
-    return (
-        <div>
-            <TextEditor />
-        </div>
-    );
-}
+  return (
+    <div style={{ height: "100%" }}>
+      <TextEditor />
+    </div>
+  );
+};
 
-export default PublishingPage
+export default PublishingPage;
