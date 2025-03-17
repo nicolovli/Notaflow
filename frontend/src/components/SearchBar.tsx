@@ -16,7 +16,7 @@ const SearchBar = <T,>({ data, onSearch, filterFunction, placeholder}: SearchBar
     const filtered = data.filter(item =>
       filterFunction(item, term));
       onSearch(filtered, term); 
-  }, 300); 
+  }, 500); 
 
   useEffect(() => {
     debouncedSearch(searchTerm);
