@@ -32,12 +32,43 @@ export const getUserGroups = async (user_id: string): Promise<Group[]> => {
       } as Group;
     });
 
+
     return groups;
   } catch (error) {
     console.error("Error fetching user groups:", error);
     throw error;
   }
 };
+
+export const existsGroupWithMembers = async(members: string[]) => {
+  try {
+    const sortedMembers = [...members].sort();
+    const groupsRef = collection(db, "groups");
+    const q = query(groupsRef, where("members", "array-contains", sortedMembers[0]));
+    const querySnapshot = await getDocs(q);
+    
+    for (const docSnapshot of querySnapshot.docs) {
+      const groupData = docSnapshot.data();
+      const groupMembers = groupData.members || [];
+      
+      if (groupMembers.length !== sortedMembers.length) {
+        continue;
+      }
+      
+      const sortedGroupMembers = [...groupMembers].sort();
+      const isMatch = sortedMembers.every((member, index) => member === sortedGroupMembers[index]);
+      
+      if (isMatch) {
+        return true; 
+      }
+    }
+    
+    return false; 
+  } catch (error) {
+    console.error("Error checking if group with members exists:", error);
+    throw error;
+  }
+}
 
 export const createGroup = async (group_name: string, members: string[]): Promise<string> => {
   try {
@@ -141,6 +172,45 @@ export const getGroupNotes = async (group_id: string): Promise<Note[]> => {
     return allNotes;
   } catch (error) {
     console.error("Error fetching group notes: ", error);
+    throw error;
+  }
+};
+
+export enum GroupSortOption {
+  MOST_RECENT_ACTIVITY_DESC = "mostRecentDesc", 
+  MOST_RECENT_ACTIVITY_ASC = "mostRecentAsc"    
+}
+
+export const getSortedUserGroups = async (user_id: string, sortBy: GroupSortOption = GroupSortOption.MOST_RECENT_ACTIVITY_DESC): Promise<Group[]> => {
+  try {
+    const allGroups = await getUserGroups(user_id);
+    
+    const getMostRecentActivityDate = (group: Group): Date => {
+      if (!group.shared_notes || group.shared_notes.length === 0) {
+        return group.createdAt; // Use group creation date if no shared notes
+      }
+      
+      const lastSharedNoteDate = group.shared_notes.reduce(
+        (latest, note) => note.date > latest ? note.date : latest,
+        new Date(0)
+      );
+      
+      return lastSharedNoteDate > group.createdAt ? lastSharedNoteDate : group.createdAt;
+    };
+    
+    return [...allGroups].sort((a, b) => {
+      const dateA = getMostRecentActivityDate(a).getTime();
+      const dateB = getMostRecentActivityDate(b).getTime();
+      
+      if (sortBy === GroupSortOption.MOST_RECENT_ACTIVITY_ASC) {
+        return dateA - dateB; 
+      } else {
+        return dateB - dateA; 
+      }
+    });
+    
+  } catch (error) {
+    console.error("Error fetching sorted user groups:", error);
     throw error;
   }
 };

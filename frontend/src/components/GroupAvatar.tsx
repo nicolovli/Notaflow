@@ -6,7 +6,7 @@ import { getAdditionalUserData } from "../firebase/func/user";
 import { stringAvatar } from "../util/avatar";
 
 
-const GroupAvatar: React.FC<{group: Group}> = ({ group }) => {
+const GroupAvatar: React.FC<{group: Group, size?: number}> = ({ group, size = 36 }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [users, setUsers] = useState<BasicUserInfo[]>([]);
@@ -48,8 +48,8 @@ const GroupAvatar: React.FC<{group: Group}> = ({ group }) => {
             max={3}
             sx={{
             "& .MuiAvatar-root": {
-                width: 36,
-                height: 36,
+                width: size,
+                height: size,
                 fontSize: "0.9rem",
                 border: "2px solid white"
             }

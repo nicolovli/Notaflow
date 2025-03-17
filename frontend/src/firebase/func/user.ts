@@ -1,4 +1,4 @@
-import {  doc, getDoc } from "firebase/firestore";
+import {  collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { db } from "../../Config/firebase-config";
 
 import { BasicUserInfo } from "../interfaces/interface.userInfo"; 
@@ -27,3 +27,21 @@ export const getAdditionalUserData = async (id: string): Promise<BasicUserInfo> 
         throw error;
       }
 };
+
+export const getAllUsers = async (): Promise<BasicUserInfo[]> => { 
+    try {
+      const usersRef = collection(db, "users");
+      const usersSnap = await getDocs(usersRef);
+      const usersInfo: BasicUserInfo[] = usersSnap.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          ...data,
+          id: doc.id
+        } as BasicUserInfo
+      })
+      return usersInfo;
+    } catch (error) {
+      console.error("Failed to fetch all users: ", error);
+      throw error; 
+    }
+}
