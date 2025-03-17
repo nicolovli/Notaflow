@@ -51,6 +51,9 @@ const FormComponent = () => {
         setText(note.content);
         setSelectedThemes(note.theme || []);
         setOption(note.access_policy.type);
+        setSelectedCategories(note.tag.map(tag => ({ id: tag, name: tag, tag: tag })));
+        setSelectedThemes(note.theme);
+        // setOption(note.access_policy.type);
 
         try {
           const subject = await getSubject(note.subject_id);
@@ -119,7 +122,7 @@ const FormComponent = () => {
       subject_id: selectedSubject?.id ?? "empty",
       title: title,
       content: text,
-      tag: selectedCategories.map((category) => category.id),
+      tag: selectedCategories.map((category) => category.tag),
       theme: selectedThemes,
       access_policy: stringToAccessPolicyType(option),
     };
