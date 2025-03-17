@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, ReactElement } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import StickyNote2Icon from "@mui/icons-material/StickyNote2";
@@ -74,7 +74,10 @@ const StyledDrawer = styled(MuiDrawer, {
   }),
 }));
 
-// List of navigation items(pages). (Add new ones here)
+type NavigationItem =
+  | { segment: string; title: string; icon: ReactElement }
+  | { kind: "divider" | "header"; title?: string };
+
 const BASE_NAVIGATION = [
   { segment: "Dashboard", title: "Dashboard", icon: <DashboardIcon /> },
   { segment: "myNotes", title: "Mine notater", icon: <StickyNote2Icon /> },
@@ -82,9 +85,10 @@ const BASE_NAVIGATION = [
   { segment: "privateGroupPage", title: "Mine grupper", icon: <GroupsIcon /> },
 ];
 
-const ADMIN_NAVIGATION = [
+const ADMIN_NAVIGATION: NavigationItem[] = [
+  { kind: "divider" },
   { segment: "createCourse", title: "Opprett Fag", icon: <CreateNewFolderIcon /> },
-  { segment: "createCategory", title: "Opprett Kategori", icon: <TagIcon/>}
+  { segment: "createCategory", title: "Opprett Kategori", icon: <TagIcon /> },
 ];
 
 const NavigationDrawer: React.FC = () => {
@@ -142,39 +146,44 @@ const NavigationDrawer: React.FC = () => {
       </DrawerHeader>
       <Divider />
       <List>
-        {navigationItems.map((item) => {
+        {navigationItems.map((item, index) => {
+          if ("kind" in item) {
+            return (
+              <Divider
+                key={index}
+                sx={{
+                  my: 1.5,
+                  height: "0px",
+                  display: "flex",
+                  alignItems: "center",
+                  // pl: 2,
+                }}>
+                {open && (
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "gray",
+                    }}>
+                    Admin funksjoner
+                  </Typography>
+                )}
+              </Divider>
+            );
+          }
+
           const isActive = location.pathname.includes(item.segment);
+
           return (
             <ListItem key={item.segment} disablePadding>
               <ListItemButton
                 onClick={() => handleNavigation(item.segment)}
                 sx={{
                   backgroundColor: isActive ? "rgba(63, 81, 181, 0.2)" : "transparent",
-                  "&:hover": {
-                    backgroundColor: "rgba(63, 81, 181, 0.1)",
-                  },
+                  "&:hover": { backgroundColor: "rgba(63, 81, 181, 0.1)" },
                   height: 48,
                 }}>
-                <ListItemIcon
-                  sx={{
-                    minWidth: 48,
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                    paddingLeft: 1.5,
-                  }}>
-                  {item.icon}
-                </ListItemIcon>
-                {open && (
-                  <ListItemText
-                    primary={item.title}
-                    sx={{
-                      fontSize: "0.9rem",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                    }}
-                  />
-                )}
+                <ListItemIcon sx={{ minWidth: 48, paddingLeft: 1.5 }}>{item.icon}</ListItemIcon>
+                {open && <ListItemText primary={item.title} />}
               </ListItemButton>
             </ListItem>
           );

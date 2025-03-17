@@ -97,6 +97,20 @@ export const isFavorite = async (userId: string, noteId: string): Promise<boolea
   }
 };
 
+export const cleanUpFavorites = async (userId: string, validNoteIds: string[]) => {
+  try {
+    const userRef = doc(db, "users", userId);
+    const userFavorites = await getUserFavorites(userId);
+
+    const cleanedFavorites = userFavorites.filter((fav) => validNoteIds.includes(fav.noteId));
+
+    await updateDoc(userRef, { favorites: cleanedFavorites });
+    console.log("Renset favorittliste for ugyldige notater.");
+  } catch (error) {
+    console.error("Feil ved opprydding av favoritter:", error);
+  }
+};
+
 export const getFavorteNotes = async (userId: string): Promise<Note[]> => {
   try {
     const userFavorites = await getUserFavorites(userId);
@@ -113,11 +127,16 @@ export const getFavorteNotes = async (userId: string): Promise<Note[]> => {
       })
     );
 
-    const filteredFavoriteNotes: Note[] = favoriteNotes.filter(
-      (note): note is Note => note !== null
-    );
+    const validNotes = favoriteNotes.filter((note): note is Note => note !== null);
 
-    return filteredFavoriteNotes;
+    if (validNotes.length < favoriteNoteIds.length) {
+      await cleanUpFavorites(
+        userId,
+        validNotes.map((note) => note.id)
+      );
+    }
+
+    return validNotes;
   } catch (error) {
     console.error("Error fetching favorite notes:", error);
     throw error;
