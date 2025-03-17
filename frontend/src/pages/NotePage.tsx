@@ -463,4 +463,5 @@ export const NotePage: React.FC = () => {
     )};
 }
 
+
 export default NotePage;
