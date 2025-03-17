@@ -138,7 +138,7 @@ const CreateCategory = () => {
                     fontWeight: "500",
                     fontFamily: "sans-serif",
                   }}>
-                  Tag
+                  Kategori
                 </label>
                 <TextField
                   type="text"
@@ -147,7 +147,7 @@ const CreateCategory = () => {
                   helperText={tagError}
                   onChange={(e) => setTag(e.target.value)}
                   fullWidth
-                  placeholder="Skriv inn en tag..."
+                  placeholder="Skriv inn en kategori..."
                 />
               </div>
     

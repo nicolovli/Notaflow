@@ -25,13 +25,10 @@ const FilterBox: React.FC<FilterBoxProps> = ({ tags, themes, onFilter, onReset }
   };
 
   const handleReset = () => {
-    console.log("Resetting filters"); // Debugging
     setSelectedTags([]);
     setSelectedTheme("");
     onReset();
   };
-
-  console.log("FilterBox re-rendered"); // Debugging
 
   return (
     <Box sx={{ mb: 5, textAlign: "center"}}>

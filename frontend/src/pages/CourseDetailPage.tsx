@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Box, Typography, CircularProgress, Alert } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { useParams } from "react-router-dom";
@@ -22,7 +22,7 @@ export const CourseDetailPage: React.FC = () => {
   //     throw new Error("Invalid state");
   // }
   const [notes, setNotes] = useState<Note[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filteredNotes, setFilteredNotes] = useState<Note[]>([]);
@@ -62,30 +62,6 @@ export const CourseDetailPage: React.FC = () => {
     applyFilters(filtered, selectedTags, selectedThemes);
   };
 
-
-  const convertTagIdsToNames = useCallback(
-    (tagIds: string[] | undefined): string[] => {
-      const safeTagIds = Array.isArray(tagIds) ? tagIds : [];
-      return safeTagIds.map((tagId) => {
-        const category = categories.find((cat) => cat.id === tagId);
-        return category ? category.tag : tagId;
-      });
-    },
-    [categories]
-  );
-  
-  const convertTagNamesToIds = useCallback(
-    (tagNames: string[] | undefined): string[] => {
-      const safeTagNames = Array.isArray(tagNames) ? tagNames : [];
-      return safeTagNames.map((tagName) => {
-        const category = categories.find((cat) => cat.tag === tagName);
-        return category ? category.id : tagName;
-      });
-    },
-    [categories]
-  );
-  
-
   const handleFilter = (tags: string[], themes: string[]) => {
     setSelectedTags(tags);
     setSelectedThemes(themes);
@@ -100,33 +76,32 @@ export const CourseDetailPage: React.FC = () => {
   }; 
 
   const applyFilters = (notesToFilter: Note[], tags: string[], themes: string[]) => {
-    console.log("Selected tags: ", tags);
-    const tagIds = convertTagNamesToIds(tags);
     const filteredThemes = themes.filter(theme => theme !== "");
-    console.log("Tag IDs", tagIds)
+    
     const filtered = notesToFilter.filter((note) => {
-        const noteTags = note.tag || [];
-        const noteThemes = note.theme || [];
-        console.log("Note tag ID: ",noteTags)
-        const matchesTags = tagIds.length === 0 || tagIds.some((tagId) => noteTags.includes(tagId));
-        const matchesThemes = filteredThemes.length === 0 || filteredThemes.some((theme) => noteThemes.includes(theme));
-        const matchesSearch = searchTerm === "" || note.title.toLowerCase().includes(searchTerm.toLowerCase());
-        return matchesTags && matchesThemes && matchesSearch;
+      const noteTags = note.tag || [];
+      const noteTagNames = noteTags.map(tag => tag.includes(':') ? tag.split(':')[1] : tag);
+      
+      const matchesTags = tags.length === 0 || tags.some((tagName) => noteTagNames.includes(tagName));
+      const matchesThemes = filteredThemes.length === 0 || filteredThemes.some((theme) => note.theme.includes(theme));
+      const matchesSearch = searchTerm === "" || note.title.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      return matchesTags && matchesThemes && matchesSearch;
     });
+    
     setFilteredNotes(filtered);
   };
-
 
   const tags = useMemo(() => {
     return Array.from(
       new Set(
         notes.flatMap((note) => {
           const noteTags = Array.isArray(note.tag) ? note.tag : [];
-          return convertTagIdsToNames(noteTags);
+          return noteTags;
         })
       )
     );
-  }, [convertTagIdsToNames, notes]);
+  }, [notes]);
   
   const themes = useMemo(() => {
     return Array.from(
