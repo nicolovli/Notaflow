@@ -1,21 +1,20 @@
 import { Snackbar } from "@mui/material";
-import { useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
 const GlobalSnackbar = () => {
-  const location = useLocation();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
   useEffect(() => {
-    const message = location.state?.message || window.history.state?.usr?.message;
-    if (message) {
-      setSnackbarMessage(message);
+    const handleSnackbarEvent = (event: Event) => {
+      const customEvent = event as CustomEvent<string>;
+      setSnackbarMessage(customEvent.detail);
       setSnackbarOpen(true);
+    };
 
-      window.history.replaceState({ ...window.history.state, usr: null }, "");
-    }
-  }, [location]);
+    window.addEventListener("globalSnackbar", handleSnackbarEvent);
+    return () => window.removeEventListener("globalSnackbar", handleSnackbarEvent);
+  }, []);
 
   return (
     <Snackbar

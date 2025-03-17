@@ -23,6 +23,7 @@ import { getAdditionalUserData } from "../firebase/func/user";
 import { BasicUserInfo } from "../firebase/interfaces/interface.userInfo";
 import { auth } from "../Config/firebase-config";
 import { deleteNote } from "../firebase/func/notes";
+import { Timestamp } from "firebase/firestore";
 import { getAverageRating, getNote } from "../firebase/func/notes";
 import Rating from "@mui/material/Rating";
 
@@ -86,23 +87,21 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
   const handleDelete = async () => {
     try {
       await deleteNote(note.id);
-      window.history.replaceState(
-        { ...window.history.state, usr: { message: "Notatet er slettet!" } },
-        ""
-      );
+
+      window.dispatchEvent(new CustomEvent("globalSnackbar", { detail: "Notatet er slettet!" }));
+
       onDelete(note.id);
     } catch (err) {
       console.error("Failed to delete note:", err);
     }
     handleMenuClose();
     setOpen(false);
-
-
   };
 
-  const containerClassName = (currentUser?.uid === note.user_id || currentUserFirebase?.isAdmin)
-    ? 'flex justify-start !mt-1 !mr-10'
-    : 'flex justify-start !mt-1 ';
+  const containerClassName =
+    currentUser?.uid === note.user_id || currentUserFirebase?.isAdmin
+      ? "flex justify-start !mt-1 !mr-10"
+      : "flex justify-start !mt-1 ";
 
   useEffect(() => {
     const fetchNoteRating = async () => {
@@ -117,6 +116,27 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
     };
     fetchNoteRating();
   }, [note.id]);
+
+  const formattedDate = (() => {
+    if (!note.date) return "Ukjent dato";
+
+    // Sjekker om note.date er allerede et Date-objekt
+    if (note.date instanceof Date) {
+      return note.date.toDateString();
+    }
+
+    // Sjekker om note.date er en Firestore Timestamp
+    if (typeof note.date === "object" && "toDate" in note.date) {
+      return (note.date as Timestamp).toDate().toDateString();
+    }
+
+    // Sjekker om note.date er et objekt med { seconds, nanoseconds }
+    if (typeof note.date === "object" && "seconds" in note.date) {
+      return new Date((note.date as { seconds: number }).seconds * 1000).toDateString();
+    }
+
+    return "Ukjent dato";
+  })();
 
   return (
     <Card
@@ -151,7 +171,7 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
             onClose={handleMenuClose}
             onClick={(e) => e.stopPropagation()}>
             {currentUserFirebase?.isAdmin === false ||
-              (currentUser?.uid === note.user_id) === true ? (
+            (currentUser?.uid === note.user_id) === true ? (
               <MenuItem onClick={handleEdit}>Rediger</MenuItem>
             ) : null}
             <MenuItem onClick={() => setOpen(true)}>Slett</MenuItem>
@@ -170,39 +190,40 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
         <CardContent>
           {/* Show each couse, example: "Statistikk (ISTT1003) with description" */}
           <div className="flex-col justify-between w-full">
-            <Typography variant="h5" sx={{ fontWeight: "bold", }}>
+            <Typography variant="h5" sx={{ fontWeight: "bold" }}>
               {note.title}
             </Typography>
             <div className={containerClassName}>
-              {note.theme && Array.isArray(note.theme) && note.theme.length > 0 ? (
-                note.theme.map((theme, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center justify-center w-fit min-w-[60px] max-h-[30px] !px-2 !mr-2 rounded-full bg-purple-100 border border-purple-600 text-purple-700 text-xs font-medium"
-                  >
-                    {theme}
-                  </span>
-                ))
-              ) : null}
+              {note.theme && Array.isArray(note.theme) && note.theme.length > 0
+                ? note.theme.map((theme, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center justify-center w-fit min-w-[60px] max-h-[30px] !px-2 !mr-2 rounded-full bg-purple-100 border border-purple-600 text-purple-700 text-xs font-medium">
+                      {theme}
+                    </span>
+                  ))
+                : null}
             </div>
             <div className="flex items-center gap-1 !mt-1">
               <Typography
                 sx={{
-                  marginTop: 0.5
+                  marginTop: 0.5,
                 }}
-                variant="body2">Rating: {averageRating.toFixed(1)}
+                variant="body2">
+                Rating: {averageRating.toFixed(1)}
               </Typography>
               <Rating
                 value={averageRating}
                 precision={0.5}
-                readOnly size="small"
+                readOnly
+                size="small"
                 sx={{
-                  fontSize: '0.85rem',
+                  fontSize: "0.85rem",
                   marginLeft: 1,
-                  marginTop: 0.5
-                }} />
+                  marginTop: 0.5,
+                }}
+              />
             </div>
-
           </div>
           <Divider sx={{ my: 1 }} />
 
@@ -218,9 +239,8 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
             </Typography>
           )}
 
-
           <Typography variant="subtitle1" color="text.secondary">
-            Laget: {note.date.toDateString()}
+            Laget: {formattedDate}
           </Typography>
         </CardContent>
       </CardActionArea>

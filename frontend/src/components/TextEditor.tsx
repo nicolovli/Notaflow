@@ -15,7 +15,6 @@ import CategorySelector from "./CategorySelector";
 import CourseSelector from "./courseSelector";
 import ThemeField from "./ThemeField";
 
-
 const FormComponent = () => {
   const { id: noteId } = useParams();
   const navigate = useNavigate();
@@ -50,7 +49,7 @@ const FormComponent = () => {
       .then(async (note) => {
         setTitle(note.title);
         setText(note.content);
-        setSelectedThemes(note.theme||[]);
+        setSelectedThemes(note.theme || []);
         setOption(note.access_policy.type);
 
         try {
@@ -64,7 +63,7 @@ const FormComponent = () => {
       .catch((error) => {
         console.error("Error fetching note:", error);
       })
-      .finally(() => { });
+      .finally(() => {});
   }, [noteId]);
 
   // const handleSubmit = (e: React.FormEvent) => {
@@ -167,7 +166,7 @@ const FormComponent = () => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          minHeight: "100vh",
+          height: "100%",
           backgroundColor: "#f3f4f6",
         }}>
         <div
@@ -244,7 +243,13 @@ const FormComponent = () => {
                   <label style={{ display: "block", fontSize: "14px", fontWeight: "500" }}>
                     Kategori
                   </label>
-                  <div style={{ borderRadius: "5px", fontFamily: "sans-serif", marginRight: "20px", marginBottom: "10px" }}>
+                  <div
+                    style={{
+                      borderRadius: "5px",
+                      fontFamily: "sans-serif",
+                      marginRight: "20px",
+                      marginBottom: "10px",
+                    }}>
                     <CategorySelector
                       key={resetKey}
                       onCategorySelect={setSelectedCategories}
@@ -256,28 +261,39 @@ const FormComponent = () => {
                   <label style={{ display: "block", fontSize: "14px", fontWeight: "500" }}>
                     Tema
                   </label>
-                  <ThemeField
-                    onThemeChange={setSelectedThemes}
-                    selectedThemes={selectedThemes}
-                  />
+                  <ThemeField onThemeChange={setSelectedThemes} selectedThemes={selectedThemes} />
                 </div>
-
-
               </div>
               <div>
-            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", fontFamily: "sans-serif" }}>Tilgjengelighet</label>
-            <select
-              value={option}
-              onChange={(e) => setOption(e.target.value)}
-              style={{ width: "100%", padding: "8px", border: "1px solid #ccc", borderRadius: "5px", fontFamily: "sans-serif" }}
-            >
-              <option value="" style={{fontFamily: "sans-serif"}}>Velg...</option>
-              <option value="private">Privat</option>
-              <option value="group">Gruppe</option>
-              <option value="public">Offentlig</option>
-            </select>
-            {optionError && <p style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>{optionError}</p>}
-          </div>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    fontFamily: "sans-serif",
+                  }}>
+                  Tilgjengelighet
+                </label>
+                <select
+                  value={option}
+                  onChange={(e) => setOption(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "8px",
+                    border: "1px solid #ccc",
+                    borderRadius: "5px",
+                    fontFamily: "sans-serif",
+                  }}>
+                  <option value="" style={{ fontFamily: "sans-serif" }}>
+                    Velg...
+                  </option>
+                  <option value="private">Privat</option>
+                  <option value="public">Offentlig</option>
+                </select>
+                {optionError && (
+                  <p style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>{optionError}</p>
+                )}
+              </div>
 
               <div>
                 <label style={{ display: "block", fontSize: "14px", fontWeight: "500" }}>

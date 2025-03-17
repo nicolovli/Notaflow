@@ -1,13 +1,13 @@
-export interface Group { 
-    id: string, 
-    members: string[], 
-    name: string,
-    createdAt: Date,
-    shared_notes: SharedNote[]
+export interface Group {
+  id: string;
+  name: string;
+  members: string[];
+  createdAt: Date;
+  shared_notes: SharedNote[];
 }
 
-export interface SharedNote { 
-    shared_by: string, 
-    note_id: string, 
-    date: Date
+export interface SharedNote {
+  shared_by: string;
+  note_id: string;
+  date: Date;
 }

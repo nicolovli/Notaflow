@@ -119,7 +119,7 @@ const CreateCourse = () => {
           justifyContent: "center",
           alignItems: "center",
           height: "100vh",
-          backgroundColor: "#f3f4f6",
+          backgroundColor: "#f8f8f8",
         }}>
         <CircularProgress />
       </div>
@@ -132,8 +132,8 @@ const CreateCourse = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "100vh",
-        backgroundColor: "#f3f4f6",
+        height: "100%",
+        backgroundColor: "#f8f8f8",
       }}>
       <div
         style={{

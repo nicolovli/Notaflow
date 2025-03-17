@@ -14,6 +14,7 @@ import NavigationDrawer from "./components/NavigationDrawer";
 import FloatingPlusButton from "./components/FloatingPlusButton";
 import CreateCoursePage from "./pages/CreateCoursePage";
 import GlobalSnackbar from "./components/GlobalSnackBar";
+import PrivateGroupsPage from "./pages/PrivateGroupsPage";
 import { CreateCategoryPage } from "./pages/CreateCategoryPage";
 
 /**
@@ -38,7 +39,7 @@ export const App = () => {
       <Header />
       <div style={{ display: "flex" }}>
         <NavigationDrawer />
-        <div style={{ flexGrow: 1, padding: "16px", overflow: "auto" }}>
+        <div style={{ flexGrow: 1, overflow: "auto" }}>
           <Routes>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/Login" element={<LoginPage />} />
@@ -55,6 +56,7 @@ export const App = () => {
               <Route path="/publishingpage/:id" element={<PublishingPage />} />
               <Route path="/createCourse/:id" element={<CreateCoursePage />} />
               <Route path="/createCategory" element={<CreateCategoryPage />} />
+              <Route path="/privateGroupPage" element={<PrivateGroupsPage />} />
             </Route>
           </Routes>
         </div>
