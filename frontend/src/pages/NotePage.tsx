@@ -51,8 +51,12 @@ export const NotePage: React.FC = () => {
           if(_note.access_policy.type == accessPolicyTypeToString(AccessPolicyType.GROUP)) {
             if(!auth.currentUser)
               return
-            if(!isUserMemberOfOneGroup(_note.access_policy.allowed_groups || [], auth.currentUser.uid) || _note.user_id !== auth.currentUser.uid) 
+            if(!(await isUserMemberOfOneGroup(_note.access_policy.allowed_groups || [], auth.currentUser.uid) || _note.user_id === auth.currentUser.uid)) {
+              console.log(_note.access_policy.allowed_groups)
+              console.log("not member")
               return
+            }
+            
           }
           setNote(_note);
           if (_note == null) {
@@ -303,7 +307,7 @@ export const NotePage: React.FC = () => {
 
         {/* Share popup */}
         {uid? (
-          <SharePopup open={shareOpen} onClose={() => setShareOpen(false)} user_id={uid} note_id={note.id}/>
+          <SharePopup open={shareOpen} onClose={() => setShareOpen(false)} user_id={uid} note={note}/>
         ) : null}
     
 

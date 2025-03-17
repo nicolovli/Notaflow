@@ -5,15 +5,16 @@ import { getUserGroups, shareNote } from "../firebase/func/groups";
 import { IosShare } from "@mui/icons-material";
 import GroupAvatar from "./GroupAvatar";
 import truncateString from "../util/truncate";
+import { Note } from "../firebase/interfaces/interface.notes";
 
 interface SharePopupProps {
   open: boolean;
   onClose: () => void;
   user_id: string;
-  note_id: string;
+  note: Note;
 }
 
-const SharePopup: React.FC<SharePopupProps> = ({ open, onClose, user_id, note_id }) => {
+const SharePopup: React.FC<SharePopupProps> = ({ open, onClose, user_id, note }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [groups, setGroups] = useState<Group[]>([]);
@@ -34,7 +35,7 @@ const SharePopup: React.FC<SharePopupProps> = ({ open, onClose, user_id, note_id
 
   const handleClick = async (g: Group) => {
     try {
-      await shareNote(note_id, g.id, user_id);
+      await shareNote(note, g.id, user_id);
       onClose();
       open = !open;
     } catch (err) {
@@ -84,7 +85,7 @@ const SharePopup: React.FC<SharePopupProps> = ({ open, onClose, user_id, note_id
         </Typography>
 
         <Box sx={{ mt: 2 }}>
-          {groups.map((g) => (
+          {groups.length > 0 ? groups.map((g) => (
             <Box
               onClick={() => handleClick(g)}
               key={g.id}
@@ -127,7 +128,17 @@ const SharePopup: React.FC<SharePopupProps> = ({ open, onClose, user_id, note_id
                 <IosShare fontSize="medium" />
               </IconButton>
             </Box>
-          ))}
+          )): (
+            <Typography
+            variant="body1"
+            sx={{
+              ml: 2,
+              fontSize: "1rem",
+              flex: 1,
+            }}>
+            Du har ingen grupper å dele med. Opprett en gruppe først hvis du ønsker å dele et notat
+          </Typography>
+          )}
         </Box>
       </Box>
     </Modal>

@@ -27,11 +27,10 @@ export const getUserGroups = async (user_id: string): Promise<Group[]> => {
         id: doc.id,
         name: data.name,
         members: data.members || [],
-        createdAt: data.createdAt?.toDate() || new Date(),
+        createdAt: data.createdAt.toDate(),
         shared_notes: data.shared_notes || [],
       } as Group;
     });
-
 
     return groups;
   } catch (error) {
@@ -97,6 +96,7 @@ export const isUserMemberOfGroup = async (group_id: string, user_id: string): Pr
     }
 
     const groupData = groupSnap.data() as Group;
+    console.log(groupData)
     return groupData.members.includes(user_id);
   } catch (error) {
     console.error("Error checking group membership: ", error);
@@ -104,14 +104,18 @@ export const isUserMemberOfGroup = async (group_id: string, user_id: string): Pr
   }
 };
 
-export const isUserMemberOfOneGroup = async (groups: string[], user_id: string) => {
+export const isUserMemberOfOneGroup = async (groups: string[], user_id: string): Promise<boolean> => {
   for (let i = 0; i < groups.length; i++) {
-    if (await isUserMemberOfGroup(groups[i], user_id)) return true;
+    console.log(groups[i], user_id)
+    if (await isUserMemberOfGroup(groups[i], user_id)) {
+      console.log("true!!")
+      return true;
+    }
   }
   return false;
 };
 
-export const shareNote = async (note_id: string, group_id: string, user_id: string) => {
+export const shareNote = async (note: Note, group_id: string, user_id: string) => {
   try {
     const isMember = await isUserMemberOfGroup(group_id, user_id);
 
@@ -119,7 +123,7 @@ export const shareNote = async (note_id: string, group_id: string, user_id: stri
 
     const shared_note: SharedNote = {
       shared_by: user_id,
-      note_id: note_id,
+      note_id: note.id,
       date: new Date(),
     };
 
@@ -129,7 +133,10 @@ export const shareNote = async (note_id: string, group_id: string, user_id: stri
       shared_notes: arrayUnion(shared_note),
     });
 
-    await giveGroupAccessToNote(note_id, group_id);
+    if(user_id === note.user_id) {
+      await giveGroupAccessToNote(note.id, group_id);
+    }
+
   } catch (error) {
     console.error(error);
     throw error;
@@ -153,7 +160,6 @@ export const getGroupNotes = async (group_id: string): Promise<Note[]> => {
       return [];
     }
 
-    // Hent alle notater parallelt for å forbedre ytelsen
     const notePromises = sharedNotes.map(async (sharedNote) => {
       try {
         const noteRef = doc(db, "notes", sharedNote.note_id);
@@ -164,7 +170,7 @@ export const getGroupNotes = async (group_id: string): Promise<Note[]> => {
       } catch (error) {
         console.error(`Error fetching note with ID ${sharedNote.note_id}:`, error);
       }
-      return null; // Returner null hvis notatet ikke finnes
+      return null; 
     });
 
     const allNotes = (await Promise.all(notePromises)).filter((note) => note !== null) as Note[];

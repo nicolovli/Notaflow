@@ -36,9 +36,6 @@ export interface NoteAccessPolicy {
 }
 
 export interface Note {
-  shared_date?: string;
-  shared_by?: string;
-  share_by_user_id: string;
   id: string;
   user_id: string;
   subject_id: string;
