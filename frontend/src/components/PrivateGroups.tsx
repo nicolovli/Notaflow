@@ -223,10 +223,12 @@ const PrivateGroupComponent: React.FC = () => {
         }}>
         {selectedGroup && (
           <Box sx={{ maxHeight: "92.5vh", overflowY: "auto" }}>
-            <Toolbar disableGutters sx={{ pl: 2, backgroundColor: "white" }}>
-              <Typography variant="h6">{selectedGroup.name}</Typography>
-            </Toolbar>
-            <Divider />
+            <Box sx={{ position: "sticky", top: "0", backgroundColor: "white", zIndex: 1000 }}>
+              <Toolbar disableGutters sx={{ pl: 2 }}>
+                <Typography variant="h6">{selectedGroup.name}</Typography>
+              </Toolbar>
+              <Divider />
+            </Box>
             {loadingNotes ? (
               <Box
                 sx={{
