@@ -3,7 +3,7 @@ import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import { createNote, updateNote, getNote } from "../firebase/func/notes";
 import { getSubject } from "../firebase/func/subject";
-import { CreateNoteInput } from "../firebase/interfaces/interface.notes";
+import { AccessPolicyType, CreateNoteInput, Note } from "../firebase/interfaces/interface.notes";
 import { auth } from "../Config/firebase-config";
 import { stringToAccessPolicyType } from "../firebase/interfaces/interface.notes";
 //import { AccessPolicyType } from "../firebase/interfaces/interface.notes";
@@ -34,6 +34,8 @@ const FormComponent = () => {
   const [textError, setTextError] = useState<string | null>(null);
   const [selectedSubjectError, setSelectedSubjectError] = useState<string | null>(null);
 
+  const [note, setNote] = useState<Note|null>(null);
+
   useEffect(() => {
     if (!noteId) {
       setTitle("");
@@ -53,6 +55,7 @@ const FormComponent = () => {
         setOption(note.access_policy.type);
         setSelectedCategories(note.tag.map(tag => ({ id: tag, name: tag, tag: tag })));
         setSelectedThemes(note.theme);
+        setNote(note);
         // setOption(note.access_policy.type);
 
         try {
@@ -69,13 +72,10 @@ const FormComponent = () => {
       .finally(() => {});
   }, [noteId]);
 
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   console.log({ title, option, selectedSubject, text });
-  // };
-
   //Send in form
   const onSubmit = async (e: React.FormEvent) => {
+    if(!note)
+      return
     // Reset errormessages
     setSelectedSubjectError(null);
     setTitleError(null);
@@ -88,32 +88,35 @@ const FormComponent = () => {
     setTitleError(null);
     setTextError(null);
 
-    //Error handling
-    let hasError = false;
 
     if (title.trim().length === 0) {
       setTitleError("Du må skrive inn en tittel for notatet");
-      hasError = true;
+      return;
     }
 
     if (text.trim().length < 20) {
       setTextError("Du må skrive inn tekst i notatet. Må være på minst 20 tegn.");
-      hasError = true;
+      return;
     }
 
     if (!selectedSubject) {
       setSelectedSubjectError("Du må velge et fag");
-      hasError = true;
+      return; 
     }
 
     if (!option) {
       setOptionError("Du må velge en tilgjengelighet");
-      hasError = true;
+      return;
     }
 
-    //Don´t continoue if there is errors
-    if (hasError) {
-      return;
+    let selectedAccessPolicy = stringToAccessPolicyType(option);
+    const currentAccessPolicy = stringToAccessPolicyType(note.access_policy.type);
+    if(selectedAccessPolicy === AccessPolicyType.PRIVATE && currentAccessPolicy === AccessPolicyType.GROUP){ 
+      selectedAccessPolicy = AccessPolicyType.GROUP;
+    } else if(selectedAccessPolicy === AccessPolicyType.PRIVATE && currentAccessPolicy === AccessPolicyType.PUBLIC && note.access_policy.allowed_groups) {
+      if(note.access_policy.allowed_groups.length > 0) {
+        selectedAccessPolicy = AccessPolicyType.GROUP;
+      }
     }
 
     //Create input
@@ -124,7 +127,8 @@ const FormComponent = () => {
       content: text,
       tag: selectedCategories.map((category) => category.tag),
       theme: selectedThemes,
-      access_policy: stringToAccessPolicyType(option),
+      access_policy: selectedAccessPolicy,
+      allowed_groups: note.access_policy.allowed_groups || []
     };
 
     try {

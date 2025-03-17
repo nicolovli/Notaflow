@@ -17,7 +17,6 @@ const AddMembers = ({ selectedUsers, setSelectedUsers, group_creator }: AddMembe
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [users, setUsers] = useState<BasicUserInfo[]>([]);
-
   const [searchQuery, setSearchQuery] = useState("");
   
   useEffect(() => {
