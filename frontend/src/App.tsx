@@ -1,5 +1,5 @@
 import { Header } from "./components/Header";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { DashboardPage } from "./pages/DashboardPage";
 import PublishingPage from "./pages/PublishingPage";
 import { CourseDetailPage } from "./pages/CourseDetailPage";
@@ -26,8 +26,10 @@ import { CreateCategoryPage } from "./pages/CreateCategoryPage";
  * Here we define the routes of the application and the components that will be rendered when the user navigates to them.
  * Therefore use <Route path="/path" element={<Component />} /> to define a route.
  */
-
 export const App = () => {
+  const location = useLocation();
+  const showFloatingButton = location.pathname !== "/privateGroupPage";
+
   return (
     <div
       style={{
@@ -35,7 +37,7 @@ export const App = () => {
         gridTemplateRows: "auto 1fr", // header = auto, main content fills the rest
         minHeight: "100vh",
       }}>
-      <FloatingPlusButton />
+      {showFloatingButton && <FloatingPlusButton />}
       <Header />
       <div style={{ display: "flex" }}>
         <NavigationDrawer />

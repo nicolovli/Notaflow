@@ -10,14 +10,19 @@ import {
   Typography,
   CircularProgress,
   Grid,
+  Button,
 } from "@mui/material";
 import { Group } from "../firebase/interfaces/interface.groups";
-import { getUserGroups, getGroupNotes } from "../firebase/func/groups";
+import { getGroupNotes, getSortedUserGroups, GroupSortOption } from "../firebase/func/groups";
 import { auth } from "../Config/firebase-config";
 import { Note } from "../firebase/interfaces/interface.notes";
 import NoteCard from "./NoteCard";
 import { getAdditionalUserData } from "../firebase/func/user";
 import { Timestamp } from "firebase/firestore";
+import GroupAvatar from "./GroupAvatar";
+import {Add as AddIcon} from "@mui/icons-material";
+import CreateGroupPopup from "./CreateGroupPopup";
+import truncateString from "../util/truncate";
 
 const drawerWidth = 240;
 
@@ -28,6 +33,9 @@ const PrivateGroupComponent: React.FC = () => {
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [groupNotes, setGroupNotes] = useState<Note[]>([]);
   const [loadingNotes, setLoadingNotes] = useState(false);
+  const [createGroupOpen, setCreateGroupOpen] = useState<boolean>(false);
+  const [rerender, setRerender] = useState<number>(0);
+  
   const notesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,8 +47,10 @@ const PrivateGroupComponent: React.FC = () => {
           return;
         }
 
-        const userGroups = await getUserGroups(user.uid);
+        const userGroups = await getSortedUserGroups(user.uid, GroupSortOption.MOST_RECENT_ACTIVITY_DESC);
         setGroups(userGroups);
+        if(userGroups.length > 0)
+          handleGroupClick(userGroups[0])
       } catch (err) {
         console.error("Feil ved innhenting av grupper", err);
         setError(err instanceof Error ? err.message : "Kunne ikke hente brukerens grupper");
@@ -50,7 +60,10 @@ const PrivateGroupComponent: React.FC = () => {
     };
 
     getGroups();
-  }, []);
+  }, [rerender]);
+
+  if(!auth.currentUser)
+    return
 
   const handleGroupClick = async (group: Group) => {
     if (!group.id) {
@@ -138,6 +151,23 @@ const PrivateGroupComponent: React.FC = () => {
 
         <Divider />
 
+        <Button
+            variant="contained"
+            size="small"
+            color="primary"
+            onClick={() => setCreateGroupOpen(true)}
+            sx={{ width: "100%", height: "48px", p: 0, boxShadow: 0, borderRadius: 0}}
+          >
+            <AddIcon fontSize="small" />
+          <Typography
+          sx={{
+            marginLeft: 1,
+            textTransform: "none"
+          }}
+          >Opprett Gruppe</Typography>
+        </Button>
+
+
         {isLoading ? (
           <Box
             sx={{
@@ -168,8 +198,10 @@ const PrivateGroupComponent: React.FC = () => {
                         backgroundColor: "rgba(63, 81, 181, 0.1)",
                       },
                       height: 48,
+                      display: "flex"
                     }}>
-                    <ListItemText primary={group.name || "Ukjent navn på gruppe"} />
+                      <GroupAvatar group={group} size={30}/><ListItemText sx={{marginLeft: 2}} primary={truncateString(group.name, 13)} />
+                    
                   </ListItemButton>
                 </ListItem>
                 <Divider />
@@ -177,7 +209,9 @@ const PrivateGroupComponent: React.FC = () => {
             ))}
           </List>
         )}
+
       </Box>
+   
       <Divider orientation="vertical" flexItem />
       <Box
         sx={{
@@ -250,6 +284,10 @@ const PrivateGroupComponent: React.FC = () => {
           </Box>
         )}
       </Box>
+      {createGroupOpen ? <CreateGroupPopup open={createGroupOpen} onClose={() => {
+        setCreateGroupOpen(false)
+        setRerender(rerender+1);
+        }} user_id={auth.currentUser.uid}/> : null}
     </div>
   );
 };
