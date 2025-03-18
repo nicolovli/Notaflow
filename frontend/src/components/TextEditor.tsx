@@ -74,8 +74,6 @@ const FormComponent = () => {
 
   //Send in form
   const onSubmit = async (e: React.FormEvent) => {
-    if(!note)
-      return
     // Reset errormessages
     setSelectedSubjectError(null);
     setTitleError(null);
@@ -110,25 +108,27 @@ const FormComponent = () => {
     }
 
     let selectedAccessPolicy = stringToAccessPolicyType(option);
-    const currentAccessPolicy = stringToAccessPolicyType(note.access_policy.type);
-    if(selectedAccessPolicy === AccessPolicyType.PRIVATE && currentAccessPolicy === AccessPolicyType.GROUP){ 
-      selectedAccessPolicy = AccessPolicyType.GROUP;
-    } else if(selectedAccessPolicy === AccessPolicyType.PRIVATE && currentAccessPolicy === AccessPolicyType.PUBLIC && note.access_policy.allowed_groups) {
-      if(note.access_policy.allowed_groups.length > 0) {
+    if(note) {
+      const currentAccessPolicy = stringToAccessPolicyType(note.access_policy.type);
+      if(selectedAccessPolicy === AccessPolicyType.PRIVATE && currentAccessPolicy === AccessPolicyType.GROUP){ 
         selectedAccessPolicy = AccessPolicyType.GROUP;
+      } else if(selectedAccessPolicy === AccessPolicyType.PRIVATE && currentAccessPolicy === AccessPolicyType.PUBLIC && note.access_policy.allowed_groups) {
+        if(note.access_policy.allowed_groups.length > 0) {
+          selectedAccessPolicy = AccessPolicyType.GROUP;
+        }
       }
     }
 
     //Create input
     const input: CreateNoteInput = {
-      user_id: auth.currentUser?.uid ?? "unkown user",
-      subject_id: selectedSubject?.id ?? "empty",
+      user_id: auth.currentUser.uid,
+      subject_id: selectedSubject.id,
       title: title,
       content: text,
       tag: selectedCategories.map((category) => category.tag),
       theme: selectedThemes,
       access_policy: selectedAccessPolicy,
-      allowed_groups: note.access_policy.allowed_groups || []
+      allowed_groups: note?.access_policy.allowed_groups || []
     };
 
     try {
