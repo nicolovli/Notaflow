@@ -72,12 +72,12 @@ const CreateCourse = () => {
     let hasError = false;
 
     if (!courseName.trim()) {
-      setNameError("Du må skrive inn et kursnavn.");
+      setNameError("Du må skrive inn et fagnavn.");
       hasError = true;
     }
 
     if (!courseCode.trim()) {
-      setCodeError("Du må skrive inn en kurskode.");
+      setCodeError("Du må skrive inn en fagkode.");
       hasError = true;
     }
 
@@ -151,7 +151,7 @@ const CreateCourse = () => {
             marginBottom: "15px",
             fontFamily: "sans-serif",
           }}>
-          {courseId ? "Rediger kurs" : "Opprett et nytt kurs!"}
+          {courseId ? "Rediger fag" : "Opprett et nytt fag!"}
         </h2>
         <form
           onSubmit={handleSubmit}
@@ -173,7 +173,7 @@ const CreateCourse = () => {
               helperText={nameError}
               onChange={(e) => setCourseName(e.target.value)}
               fullWidth
-              placeholder="Skriv inn kursnavn..."
+              placeholder="Skriv inn fagnavn..."
             />
           </div>
 
@@ -194,7 +194,7 @@ const CreateCourse = () => {
               helperText={codeError}
               onChange={(e) => setCourseCode(e.target.value)}
               fullWidth
-              placeholder="Skriv inn kurskode (f.eks. TDT4100)..."
+              placeholder="Skriv inn fagkode (f.eks. TDT4100)..."
             />
           </div>
 
@@ -216,7 +216,7 @@ const CreateCourse = () => {
               helperText={descriptionError}
               onChange={(e) => setDescription(e.target.value)}
               fullWidth
-              placeholder="Skriv en kort beskrivelse av kurset..."
+              placeholder="Skriv en kort beskrivelse av faget..."
             />
           </div>
 
@@ -233,7 +233,7 @@ const CreateCourse = () => {
               borderRadius: "5px",
               cursor: "pointer",
             }}>
-            {loading ? "Lagrer..." : courseId ? "Oppdater kurs" : "Opprett kurs"}
+            {loading ? "Lagrer..." : courseId ? "Oppdater dag" : "Opprett fag"}
           </button>
         </form>
       </div>

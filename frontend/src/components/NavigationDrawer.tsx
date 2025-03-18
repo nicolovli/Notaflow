@@ -87,8 +87,8 @@ const BASE_NAVIGATION = [
 
 const ADMIN_NAVIGATION: NavigationItem[] = [
   { kind: "divider" },
-  { segment: "createCourse", title: "Opprett Fag", icon: <CreateNewFolderIcon /> },
-  { segment: "createCategory", title: "Opprett Kategori", icon: <TagIcon /> },
+  { segment: "createCourse", title: "Opprett fag", icon: <CreateNewFolderIcon /> },
+  { segment: "createCategory", title: "Opprett kategori", icon: <TagIcon /> },
 ];
 
 const NavigationDrawer: React.FC = () => {
@@ -164,7 +164,7 @@ const NavigationDrawer: React.FC = () => {
                     sx={{
                       color: "gray",
                     }}>
-                    Admin funksjoner
+                    Adminfunksjoner
                   </Typography>
                 )}
               </Divider>
