@@ -54,7 +54,6 @@ const FormComponent = () => {
         setSelectedThemes(note.theme || []);
         setOption(note.access_policy.type);
         setSelectedCategories(note.tag.map(tag => ({ id: tag, name: tag, tag: tag })));
-        setSelectedThemes(note.theme);
         setNote(note);
         // setOption(note.access_policy.type);
 
