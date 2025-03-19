@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { auth } from "../Config/firebase-config";
 import { getAdditionalUserData } from "../firebase/func/user";
 import { createCategory, getCategory } from "../firebase/func/category";
-import { Alert, CircularProgress, TextField } from "@mui/material";
+import { Alert, CircularProgress, TextField, Paper, Typography, Button } from "@mui/material";
 import type { CreateCategory } from "../firebase/interfaces/interface.category";
 
 const CreateCategory = () => {
@@ -86,91 +86,77 @@ const CreateCategory = () => {
     }
   };
 
-  if (isFetching) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          backgroundColor: "#f3f4f6",
-        }}>
-        <CircularProgress />
-      </div>
-    );
-  }
-
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "calc(100vh - 68px)",
-        backgroundColor: "#f3f4f6",
-      }}>
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "600px",
-          padding: "20px",
-          backgroundColor: "white",
-          borderRadius: "10px",
-          boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-        }}>
-        <h2
-          style={{
-            fontSize: "20px",
-            fontWeight: "bold",
-            marginBottom: "15px",
-            fontFamily: "sans-serif",
-          }}>
-          {categoryId ? "Rediger kategori" : "Opprett en ny kategori!"}
-        </h2>
-        <form
-          onSubmit={handleSubmit}
-          style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-          <div>
-            <label
-              style={{
-                display: "block",
-                fontSize: "14px",
-                fontWeight: "500",
-                fontFamily: "sans-serif",
-              }}>
-              Kategori
-            </label>
-            <TextField
-              type="text"
-              value={tag}
-              error={!!tagError}
-              helperText={tagError}
-              onChange={(e) => setTag(e.target.value)}
-              fullWidth
-              placeholder="Skriv inn en kategori..."
-            />
-          </div>
-
-          <button
-            type="submit"
-            onClick={onSubmit}
-            disabled={loading}
+    if (isFetching) {
+        return(
+            <div
             style={{
-              width: "100%",
-              padding: "10px",
-              backgroundColor: "#007BFF",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100vh",
             }}>
-            {loading ? "Lagrer..." : categoryId ? "Oppdater kategori" : "Opprett kategori"}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-};
+                <CircularProgress/>
+            </div>
+        );
+    }
+
+    return (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "calc(100vh - 68px)",
+          }}>
+          <Paper
+            elevation={3}
+            sx={{
+              width: "100%",
+              maxWidth: 600,
+              p: 3,
+              borderRadius: 2,
+              // Du kan gjerne justere margin, padding osv. 
+            }}
+          >
+
+          <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
+          {categoryId ? "Rediger kategori" : "Opprett en ny kategori!"}
+          </Typography>
+            <form
+              onSubmit={handleSubmit}
+              style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+              <div>
+              <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
+                Tag
+              </Typography>
+                <TextField
+                  type="text"
+                  value={tag}
+                  error={!!tagError}
+                  helperText={tagError}
+                  onChange={(e) => setTag(e.target.value)}
+                  fullWidth
+                  placeholder="Skriv inn en tag..."
+                />
+              </div>
+    
+              <Button
+              type="submit"
+              onClick={onSubmit}
+              disabled={loading}
+              variant="contained" 
+              sx={{ mt: 2, alignSelf: "flex-start" }}
+               >
+              {loading
+                ? "Lagrer..."
+                : categoryId
+                ? "Oppdater kategori"
+                : "Opprett kategori"}
+              </Button>
+            </form>
+          </Paper>
+        </div>
+      );
+}
 
 export default CreateCategory;

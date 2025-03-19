@@ -133,18 +133,17 @@ const PrivateGroupComponent: React.FC = () => {
   }, [groupNotes]);
 
   return (
-    <div style={{ display: "flex", minWidth: "100%" }}>
+    <Box style={{ display: "flex", minWidth: "100%" }}>
       <Box
         sx={{
           width: drawerWidth,
           flexShrink: 0,
           display: "flex",
           flexDirection: "column",
-          backgroundColor: "white",
           minHeight: "100%",
         }}>
         <Toolbar disableGutters sx={{ pl: 2 }}>
-          <Typography variant="h6" sx={{ color: "black" }}>
+          <Typography variant="h6">
             Mine grupper
           </Typography>
         </Toolbar>
@@ -154,7 +153,6 @@ const PrivateGroupComponent: React.FC = () => {
         <Button
             variant="contained"
             size="small"
-            color="primary"
             onClick={() => setCreateGroupOpen(true)}
             sx={{ width: "100%", height: "48px", p: 0, boxShadow: 0, borderRadius: 0}}
           >
@@ -187,16 +185,16 @@ const PrivateGroupComponent: React.FC = () => {
         ) : (
           <List disablePadding>
             {groups.map((group) => (
-              <div key={group.id}>
+              <Box key={group.id}>
                 <ListItem disablePadding>
                   <ListItemButton
                     onClick={() => handleGroupClick(group)}
                     sx={{
-                      backgroundColor:
-                        selectedGroup?.id === group.id ? "rgba(63, 81, 181, 0.2)" : "transparent",
-                      "&:hover": {
-                        backgroundColor: "rgba(63, 81, 181, 0.1)",
-                      },
+                      // backgroundColor:
+                      //   selectedGroup?.id === group.id ? "rgba(63, 81, 181, 0.2)" : "transparent",
+                      // "&:hover": {
+                      //   backgroundColor: "rgba(63, 81, 181, 0.1)",
+                      // },
                       height: 48,
                       display: "flex"
                     }}>
@@ -205,7 +203,7 @@ const PrivateGroupComponent: React.FC = () => {
                   </ListItemButton>
                 </ListItem>
                 <Divider />
-              </div>
+              </Box>
             ))}
           </List>
         )}
@@ -218,12 +216,11 @@ const PrivateGroupComponent: React.FC = () => {
           flexGrow: 1,
           display: "flex",
           flexDirection: "column",
-          backgroundColor: "#f8f8f8",
           minHeight: "100%",
         }}>
         {selectedGroup && (
           <Box sx={{ maxHeight: "92.5vh", overflowY: "auto" }}>
-            <Box sx={{ position: "sticky", top: "0", backgroundColor: "white", zIndex: 1000 }}>
+            <Box sx={{ position: "sticky", top: "0", zIndex: 1000 }}>
               <Toolbar disableGutters sx={{ pl: 2 }}>
                 <Typography variant="h6">{selectedGroup.name}</Typography>
               </Toolbar>
@@ -290,7 +287,7 @@ const PrivateGroupComponent: React.FC = () => {
         setCreateGroupOpen(false)
         setRerender(rerender+1);
         }} user_id={auth.currentUser.uid}/> : null}
-    </div>
+    </Box>
   );
 };
 

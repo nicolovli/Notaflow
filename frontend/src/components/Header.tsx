@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { AuthLogout } from "./logout";
 import Button from "@mui/material/Button";
 import { useAuth } from "../firebase/func/useAuth";
+import { ThemeToggle } from './ThemeToggle';
+import { Box } from "@mui/material";
+
 
 const Dropdown = ({
   isOpen,
@@ -17,7 +20,7 @@ const Dropdown = ({
   if (!isOpen) return null;
 
   return (
-    <div className="absolute right-0 mt-8 w-40 bg-white border-gray-300 shadow-md rounded-lg">
+    <Box className="absolute right-0 mt-8 w-40 bg-white border-gray-300 shadow-md rounded-lg">
       <ul className="text-gray-800 text-2xl">
         <li
           className="px-4 py-2 hover:bg-indigo-100 cursor-pointer rounded-lg h-12 flex items-center justify-center"
@@ -30,7 +33,7 @@ const Dropdown = ({
           Logg ut
         </li>
       </ul>
-    </div>
+    </Box>
   );
 };
 
@@ -49,27 +52,29 @@ export const Header = () => {
   }, [isLoggedIn]);
 
   return (
-    <div className="relative border-b-[1.5px] h-17 border-b-gray-100 bg-[#19262d] flex items-center">
+    <div className="relative border-b-[1.5px] h-17 border-b-gray-100 bg-[#19262d] flex items-center justify-between px-4">
       <div className="left-20 relative text-4xl text-white cursor-pointer" onClick={() => navigate("/Dashboard")}>
         NOTAFLOW
       </div>
+      
+      {/* Right side elements */}
+      <div className="flex items-center gap-4 sticky right-10">
+        {/* Dark/light mode switch */}
+        <ThemeToggle />
 
-      {/* Log in button */}
-      <div className="absolute flex items-center right-10">
+        {/* Log in button or user icon */}
         {!isLoggedIn ? (
-          <div>
-            <Button
-              sx={{ marginRight: "20px" }}
-              variant="contained"
-              color="success"
-              size="large"
-              onClick={() => navigate("/Login")}>
-              Logg inn
-            </Button>
-          </div>
+          <Button
+            sx={{ marginRight: "-10px" }}
+            variant="contained"
+            color="success"
+            size="large"
+            onClick={() => navigate("/Login")}>
+            Logg inn
+          </Button>
         ) : (
           // Postbutton and user icon
-          <div className="right-10 flex items-center gap-6">
+          <div className="flex items-center gap-6">
             {/* <button
               className="h-10 w-10 border-2 border-black text-black bg-transparent text-3xl rounded-lg flex items-center justify-center hover:bg-indigo-900 transition cursor-pointer"
               onClick={() => navigate("/PublishingPage")}>

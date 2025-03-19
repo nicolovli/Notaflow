@@ -51,11 +51,11 @@ export const DashboardMostViewedNotes: React.FC = () => {
         {/* Overskrift */}
         <Typography
           variant="h3"
-          color="#19262d"
           sx={{ fontWeight: "bold", mb: 1, textAlign: "center" }}>
           Populære notater
         </Typography>
-        <Typography variant="h6" color="textSecondary" sx={{ mb: 4, textAlign: "center" }}>
+        <Typography variant="h6" 
+          sx={{ mb: 4, textAlign: "center" }}>
           Utforsk de mest populære notatene laget av studenter på NTNU
         </Typography>
 

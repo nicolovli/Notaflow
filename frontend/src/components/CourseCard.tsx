@@ -103,10 +103,6 @@ const CourseCard: React.FC<Props> = ({ course, onDelete }) => {
               top: 8,
               right: 8,
               zIndex: 10,
-              backgroundColor: "rgba(255, 255, 255, 0)",
-              "&:hover": {
-                backgroundColor: "rgba(0, 0, 0, 0.1)",
-              },
             }}>
             <MoreVertIcon />
           </IconButton>
@@ -136,11 +132,11 @@ const CourseCard: React.FC<Props> = ({ course, onDelete }) => {
           <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
             {course.name}
           </Typography>
-          <Typography variant="subtitle1" color="text.secondary">
+          <Typography variant="subtitle1">
             {course.subject_code}
           </Typography>
           <Divider sx={{ my: 1 }} />
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2">
             {courseDescription}
           </Typography>
         </CardContent>

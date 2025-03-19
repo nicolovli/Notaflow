@@ -16,6 +16,7 @@ import CreateCoursePage from "./pages/CreateCoursePage";
 import GlobalSnackbar from "./components/GlobalSnackBar";
 import PrivateGroupsPage from "./pages/PrivateGroupsPage";
 import { CreateCategoryPage } from "./pages/CreateCategoryPage";
+import { CustomThemeProvider } from "./context/ThemeContext";
 
 /**
  * Root component of the application.
@@ -31,39 +32,42 @@ export const App = () => {
   const showFloatingButton = location.pathname !== "/privateGroupPage";
 
   return (
-    <div
-      style={{
-        display: "grid",
+    <CustomThemeProvider>
+      <div
+        style={{
+          display: "grid",
         gridTemplateRows: "auto 1fr", // header = auto, main content fills the rest
-        minHeight: "100vh",
-      }}>
-      {showFloatingButton && <FloatingPlusButton />}
-      <Header />
-      <div style={{ display: "flex" }}>
-        <NavigationDrawer />
-        <div style={{ flexGrow: 1, overflow: "auto" }}>
-          <Routes>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/Login" element={<LoginPage />} />
-            <Route path="/Dashboard" element={<DashboardPage />} />
-            <Route path="/course/:id" element={<CourseDetailPage />} />
-            <Route path="/Registration" element={<RegistrationPage />} />
-            <Route path="/notes/:id" element={<NotePage />} />
-            <Route element={<ProtectedRoute />}>
-              <Route path="/user" element={<UserPage />} />
-              <Route path="/myNotes" element={<MyNotesPage />} />
-              <Route path="/myFavoriteNotes" element={<FavoriteNotesPage />} />
-              <Route path="/PublishingPage" element={<PublishingPage />} />
-              <Route path="/createCourse" element={<CreateCoursePage />} />
-              <Route path="/publishingpage/:id" element={<PublishingPage />} />
-              <Route path="/createCourse/:id" element={<CreateCoursePage />} />
-              <Route path="/createCategory" element={<CreateCategoryPage />} />
-              <Route path="/privateGroupPage" element={<PrivateGroupsPage />} />
+          minHeight: "100vh",
+        }}
+      >
+        {showFloatingButton && <FloatingPlusButton />}
+        <Header />
+        <div style={{ display: "flex" }}>
+          <NavigationDrawer />
+          <div style={{ flexGrow: 1, overflow: "auto" }}>
+            <Routes>
+              <Route path="/" element={<DashboardPage />} />
+              <Route path="/Login" element={<LoginPage />} />
+              <Route path="/Dashboard" element={<DashboardPage />} />
+              <Route path="/course/:id" element={<CourseDetailPage />} />
+              <Route path="/Registration" element={<RegistrationPage />} />
+              <Route path="/notes/:id" element={<NotePage />} />
+              <Route element={<ProtectedRoute />}>
+                <Route path="/user" element={<UserPage />} />
+                <Route path="/myNotes" element={<MyNotesPage />} />
+                <Route path="/myFavoriteNotes" element={<FavoriteNotesPage />} />
+                <Route path="/PublishingPage" element={<PublishingPage />} />
+                <Route path="/createCourse" element={<CreateCoursePage />} />
+                <Route path="/publishingpage/:id" element={<PublishingPage />} />
+                <Route path="/createCourse/:id" element={<CreateCoursePage />} />
+                <Route path="/createCategory" element={<CreateCategoryPage />} />
+                <Route path="/privateGroupPage" element={<PrivateGroupsPage />} />
             </Route>
-          </Routes>
+            </Routes>
+          </div>
         </div>
+        <GlobalSnackbar />
       </div>
-      <GlobalSnackbar />
-    </div>
+    </CustomThemeProvider>
   );
 };

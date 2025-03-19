@@ -9,7 +9,7 @@ import { stringToAccessPolicyType } from "../firebase/interfaces/interface.notes
 //import { AccessPolicyType } from "../firebase/interfaces/interface.notes";
 import { Subject } from "../firebase/interfaces/interface.subject";
 import { Category } from "../firebase/interfaces/interface.category";
-import { TextField, CircularProgress } from "@mui/material";
+import { TextField, CircularProgress, Box, Paper, Typography, Button } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import CategorySelector from "./CategorySelector";
 import CourseSelector from "./courseSelector";
@@ -153,40 +153,39 @@ const FormComponent = () => {
 
   if (loading) {
     return (
-      <div
+      <Box
         style={{
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
           height: "100vh",
-          backgroundColor: "#f3f4f6",
+          backgroundColor: "background.default",
         }}>
         <CircularProgress />
-      </div>
+      </Box>
     );
   }
 
   return (
-    <>
-      <div
+  
+      <Box
         style={{
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
           height: "100%",
-          backgroundColor: "#f3f4f6",
+          backgroundColor: "background.default",
         }}>
-        <div
+        <Paper
           style={{
             width: "100%",
             maxWidth: "600px",
             padding: "20px",
-            backgroundColor: "white",
+            backgroundColor: "background.default",
             borderRadius: "10px",
             boxShadow: "0 0 10px rgba(0,0,0,0.1)",
           }}>
-          <>
-            <h2
+            <Typography
               style={{
                 fontSize: "20px",
                 fontWeight: "bold",
@@ -194,12 +193,13 @@ const FormComponent = () => {
                 fontFamily: "sans-serif",
               }}>
               {noteId ? "Rediger notat" : "Publiser et notat!"}
-            </h2>
+            </Typography>
+
             <form
               onSubmit={onSubmit}
               style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-              <div>
-                <label
+              <Box>
+                <Typography
                   style={{
                     display: "block",
                     fontSize: "14px",
@@ -207,7 +207,7 @@ const FormComponent = () => {
                     fontFamily: "sans-serif",
                   }}>
                   Tittel
-                </label>
+                </Typography>
                 <TextField
                   type="text"
                   value={title}
@@ -222,10 +222,10 @@ const FormComponent = () => {
                   }}
                   placeholder="Skriv inn tittel..."
                 />
-              </div>
+              </Box>
 
-              <div>
-                <label
+              <Box>
+                <Typography
                   style={{
                     display: "block",
                     fontSize: "14px",
@@ -233,24 +233,26 @@ const FormComponent = () => {
                     fontFamily: "sans-serif",
                   }}>
                   Fag
-                </label>
+                </Typography>
                 <CourseSelector
                   key={resetKey}
                   onSubjectSelect={setSelectedSubject}
                   selectedSubject={selectedSubject}
                 />
                 {selectedSubjectError && (
-                  <p style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>
+                  <Typography style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>
                     {selectedSubjectError}
-                  </p>
+                  </Typography>
                 )}
-              </div>
-              <div className="flex">
-                <div style={{ display: "flex", flexDirection: "column", width: "50%" }}>
-                  <label style={{ display: "block", fontSize: "14px", fontWeight: "500" }}>
+              </Box>
+
+
+              <Box className="flex">
+                <Box style={{ display: "flex", flexDirection: "column", width: "50%" }}>
+                  <Typography style={{ display: "block", fontSize: "14px", fontWeight: "500" }}>
                     Kategori
-                  </label>
-                  <div
+                  </Typography>
+                  <Box
                     style={{
                       borderRadius: "5px",
                       fontFamily: "sans-serif",
@@ -262,56 +264,60 @@ const FormComponent = () => {
                       onCategorySelect={setSelectedCategories}
                       selectedCategories={selectedCategories}
                     />
-                  </div>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", width: "50%" }}>
-                  <label style={{ display: "block", fontSize: "14px", fontWeight: "500" }}>
+                  </Box>
+                </Box>
+                <Box style={{ display: "flex", flexDirection: "column", width: "50%" }}>
+                  <Typography style={{ display: "block", fontSize: "14px", fontWeight: "500" }}>
                     Tema
-                  </label>
-                  <ThemeField onThemeChange={setSelectedThemes} selectedThemes={selectedThemes} />
-                </div>
-              </div>
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    fontFamily: "sans-serif",
-                  }}>
-                  Tilgjengelighet
-                </label>
-                <select
-                  value={option}
-                  onChange={(e) => setOption(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "8px",
-                    border: "1px solid #ccc",
-                    borderRadius: "5px",
-                    fontFamily: "sans-serif",
-                  }}>
-                  <option value="" style={{ fontFamily: "sans-serif" }}>
-                    Velg...
-                  </option>
-                  <option value="private">Privat</option>
-                  <option value="public">Offentlig</option>
-                </select>
-                {optionError && (
+                  </Typography>
+
+                  <ThemeField
+                    onThemeChange={setSelectedThemes}
+                    selectedThemes={selectedThemes}
+                  />
+                </Box>
+              </Box>
+
+            <div>
+              <label style={{ 
+                display: "block", 
+                fontSize: "14px", 
+                fontWeight: "500", 
+                fontFamily: "sans-serif" 
+              }}>
+              Tilgjengelighet
+              </label>
+              <select
+                value={option}
+                onChange={(e) => setOption(e.target.value)}
+                style={{ 
+                  width: "100%", 
+                  padding: "8px", 
+                  border: "1px solid #ccc", 
+                  borderRadius: "5px", 
+                  fontFamily: "sans-serif" 
+                }}>
+                <option value="" style={{fontFamily: "sans-serif"}}>
+                  Velg...
+                </option>
+                <option value="private">Privat</option>
+                <option value="public">Offentlig</option>
+              </select>
+              {optionError && (
                   <p style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>{optionError}</p>
                 )}
-              </div>
+            </div> 
 
-              <div>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: "500" }}>
+              <Box>
+                <Typography style={{ display: "block", fontSize: "14px", fontWeight: "500" }}>
                   Notat
-                </label>
+                </Typography>
                 <ReactQuill
                   key={resetKey}
                   value={text}
                   onChange={setText}
                   style={{
-                    backgroundColor: "white",
+                    //backgroundColor: "white",
                     border: textError ? "1px solid red" : "1px solid #ccc",
                     borderRadius: "5px",
                     height: "200px",
@@ -321,9 +327,9 @@ const FormComponent = () => {
                 {textError && (
                   <p style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>{textError}</p>
                 )}
-              </div>
+              </Box>
 
-              <button
+              <Button
                 type="submit"
                 style={{
                   width: "100%",
@@ -335,12 +341,10 @@ const FormComponent = () => {
                   cursor: "pointer",
                 }}>
                 {noteId ? "Oppdater" : "Lag notat"}
-              </button>
+              </Button>
             </form>
-          </>
-        </div>
-      </div>
-    </>
+      </Paper>
+    </Box>
   );
 };
 

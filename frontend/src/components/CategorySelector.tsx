@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Category } from "../firebase/interfaces/interface.category";
 import { getAllCategory } from "../firebase/func/category";
-import { Alert, TextField } from "@mui/material";
+import { Alert, Box, TextField } from "@mui/material";
+import { Paper } from "@mui/material";
 
 interface CourseCategoryProps {
   onCategorySelect: (category: Category[]) => void;
@@ -78,8 +79,8 @@ const CourseSelector: React.FC<CourseCategoryProps> = ({
   };
 
   return (
-    <div className="relative w-full">
-      <div className="relative">
+    <Box className="relative w-full">
+      <Box className="relative">
         <TextField
           fullWidth
           variant="outlined"
@@ -104,7 +105,7 @@ const CourseSelector: React.FC<CourseCategoryProps> = ({
             marginBottom: "10px",
           }}
         />
-      </div>
+      </Box>
 
       {error && (
         <Alert variant="filled" severity="error" style={{ marginTop: "10px" }}>
@@ -113,13 +114,14 @@ const CourseSelector: React.FC<CourseCategoryProps> = ({
       )}
 
       {!isLoading && isOpen && (
-        <div
+        <Paper
           ref={dropdownRef}
           style={{
             position: "absolute",
             zIndex: 10,
             width: "100%",
-            backgroundColor: "white",
+            backgroundColor: "background.paper",
+            color: "text.primary",
             borderRadius: "5px",
             boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
             maxHeight: "300px",
@@ -146,7 +148,7 @@ const CourseSelector: React.FC<CourseCategoryProps> = ({
               ))}
             </ul>
           )}
-        </div>
+        </Paper>
       )}
 
       {/* Display selected categories */}
@@ -170,7 +172,7 @@ const CourseSelector: React.FC<CourseCategoryProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </Box>
   );
 };
 
