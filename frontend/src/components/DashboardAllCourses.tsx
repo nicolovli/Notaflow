@@ -65,9 +65,7 @@ export const DashboardAllCourses: React.FC = () => {
     return (
       <Box sx={{ pt: 5, pr: 12, pb: 3, pl: 12 }}>
         {/* Overskrift */}
-        <Typography
-          variant="h3"
-          sx={{ fontWeight: "bold", mb: 1, textAlign: "center" }}>
+        <Typography variant="h3" sx={{ fontWeight: "bold", mb: 1, textAlign: "center" }}>
           Tilgjengelige fag
         </Typography>
         <Typography variant="h6" sx={{ mb: 4, textAlign: "center" }}>
@@ -77,9 +75,9 @@ export const DashboardAllCourses: React.FC = () => {
         {/* Søkebar */}
         <Box sx={{ mb: 5, textAlign: "center" }}>
           <SearchBar<Subject>
-            data = {subjects}
+            data={subjects}
             onSearch={(filtered: Subject[], term: string) => handleSearch(filtered, term)}
-            filterFunction={(subject, term) => 
+            filterFunction={(subject, term) =>
               subject.subject_code.toLowerCase().includes(term.toLowerCase()) ||
               subject.name.toLowerCase().includes(term.toLowerCase())
             }
@@ -108,9 +106,7 @@ export const DashboardAllCourses: React.FC = () => {
     return (
       <Box sx={{ pt: 5, pr: 12, pb: 3, pl: 12 }}>
         {/* Overskrift */}
-        <Typography
-          variant="h3"
-          sx={{ fontWeight: "bold", mb: 1, textAlign: "center" }}>
+        <Typography variant="h3" sx={{ fontWeight: "bold", mb: 1, textAlign: "center" }}>
           Tilgjengelige fag
         </Typography>
         <Typography variant="h6" sx={{ mb: 4, textAlign: "center" }}>
@@ -118,13 +114,14 @@ export const DashboardAllCourses: React.FC = () => {
         </Typography>
         <Box sx={{ mb: 5, textAlign: "center" }}>
           <SearchBar<Subject>
-            data = {subjects}
+            data={subjects}
             onSearch={(filtered: Subject[], term: string) => handleSearch(filtered, term)}
-            filterFunction={(subject, term) => 
-            subject.subject_code.toLowerCase().includes(term.toLowerCase()) ||
-            subject.name.toLowerCase().includes(term.toLowerCase())}
+            filterFunction={(subject, term) =>
+              subject.subject_code.toLowerCase().includes(term.toLowerCase()) ||
+              subject.name.toLowerCase().includes(term.toLowerCase())
+            }
             placeholder="Søk etter fag"
-            />
+          />
         </Box>
         <Alert variant="filled" severity="info">
           Dette faget er dessverre ikke tilgjengelig.

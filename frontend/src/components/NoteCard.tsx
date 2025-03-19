@@ -30,7 +30,7 @@ import Rating from "@mui/material/Rating";
 
 interface Props {
   note: Note;
-  onDelete: (noteId: string) => void;
+  onDelete?: (noteId: string) => void;
 }
 
 const NoteCard: React.FC<Props> = ({ note, onDelete }) => {

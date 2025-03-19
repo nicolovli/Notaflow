@@ -19,7 +19,7 @@ const SharePopup: React.FC<SharePopupProps> = ({ open, onClose, user_id, note })
   const [error, setError] = useState<string | null>(null);
   const [groups, setGroups] = useState<Group[]>([]);
 
-    const theme = useTheme();
+  const theme = useTheme();
 
   useEffect(() => {
     const getGroups = async () => {
@@ -39,6 +39,9 @@ const SharePopup: React.FC<SharePopupProps> = ({ open, onClose, user_id, note })
     try {
       await shareNote(note, g.id, user_id);
       onClose();
+      window.dispatchEvent(
+        new CustomEvent("globalSnackbar", { detail: `Notatet er delt med ${g.name}!` })
+      );
       open = !open;
     } catch (err) {
       console.error(err);
@@ -80,67 +83,70 @@ const SharePopup: React.FC<SharePopupProps> = ({ open, onClose, user_id, note })
             mb: 3,
             fontWeight: "bold",
             textAlign: "center",
-            borderBottom: `1px solid ${theme.palette.divider}`, 
+            borderBottom: `1px solid ${theme.palette.divider}`,
             paddingBottom: 2,
           }}>
           Del med gruppe
         </Typography>
 
         <Box sx={{ mt: 2 }}>
-          {groups.length > 0 ? groups.map((g) => (
-            <Box
-              onClick={() => handleClick(g)}
-              key={g.id}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                p: 2,
-                mb: 2,
-                borderRadius: 5,
-                backgroundColor: "#f5f5f5",
-                transition: "all 0.2s ease",
-                cursor: "pointer",
-                border: "1px solid transparent",
-                "&:hover": {
-                  backgroundColor: theme.palette.action.hover,
-                  borderColor: theme.palette.primary.main,
-                  transform: "translateY(-2px)",
-                },
-              }}>
-              <GroupAvatar group={g} />
-
-              <Typography
-                variant="h6"
+          {groups.length > 0 ? (
+            groups.map((g) => (
+              <Box
+                onClick={() => handleClick(g)}
+                key={g.id}
                 sx={{
-                  ml: 2,
-                  fontWeight: "600",
-                  fontSize: "1rem",
-                  flex: 1,
-                    color: "black",
-                }}>
-                {truncateString(g.name, 18)}
-              </Typography>
-              <IconButton
-                size="small"
-                sx={{
-                  color: "primary.main",
+                  display: "flex",
+                  alignItems: "center",
+                  p: 2,
+                  mb: 2,
+                  borderRadius: 5,
+                  backgroundColor: "#f5f5f5",
+                  transition: "all 0.2s ease",
+                  cursor: "pointer",
+                  border: "1px solid transparent",
                   "&:hover": {
                     backgroundColor: theme.palette.action.hover,
+                    borderColor: theme.palette.primary.main,
+                    transform: "translateY(-2px)",
                   },
                 }}>
-                <IosShare fontSize="medium" />
-              </IconButton>
-            </Box>
-          )): (
+                <GroupAvatar group={g} />
+
+                <Typography
+                  variant="h6"
+                  sx={{
+                    ml: 2,
+                    fontWeight: "600",
+                    fontSize: "1rem",
+                    flex: 1,
+                    color: "black",
+                  }}>
+                  {truncateString(g.name, 18)}
+                </Typography>
+                <IconButton
+                  size="small"
+                  sx={{
+                    color: "primary.main",
+                    "&:hover": {
+                      backgroundColor: theme.palette.action.hover,
+                    },
+                  }}>
+                  <IosShare fontSize="medium" />
+                </IconButton>
+              </Box>
+            ))
+          ) : (
             <Typography
-            variant="body1"
-            sx={{
-              ml: 2,
-              fontSize: "1rem",
-              flex: 1,
-            }}>
-            Du har ingen grupper å dele med. Opprett en gruppe først hvis du ønsker å dele et notat
-          </Typography>
+              variant="body1"
+              sx={{
+                ml: 2,
+                fontSize: "1rem",
+                flex: 1,
+              }}>
+              Du har ingen grupper å dele med. Opprett en gruppe først hvis du ønsker å dele et
+              notat
+            </Typography>
           )}
         </Box>
       </Box>
