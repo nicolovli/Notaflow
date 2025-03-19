@@ -11,6 +11,7 @@ import {
   CircularProgress,
   Grid,
   Button,
+  useTheme,
 } from "@mui/material";
 import { Group } from "../firebase/interfaces/interface.groups";
 import { getGroupNotes, getSortedUserGroups, GroupSortOption } from "../firebase/func/groups";
@@ -20,23 +21,33 @@ import NoteCard from "./NoteCard";
 import { getAdditionalUserData } from "../firebase/func/user";
 import { Timestamp } from "firebase/firestore";
 import GroupAvatar from "./GroupAvatar";
-import {Add as AddIcon} from "@mui/icons-material";
+import { Add as AddIcon } from "@mui/icons-material";
 import CreateGroupPopup from "./CreateGroupPopup";
 import truncateString from "../util/truncate";
 
 const drawerWidth = 240;
+
+interface SharedNoteWithNoteData {
+  note_data: Note;
+  shared_metadata: {
+    shared_by_id: string;
+    shared_by_name: string;
+    date: string;
+  };
+}
 
 const PrivateGroupComponent: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
-  const [groupNotes, setGroupNotes] = useState<Note[]>([]);
+  const [groupNotes, setGroupNotes] = useState<SharedNoteWithNoteData[]>([]);
   const [loadingNotes, setLoadingNotes] = useState(false);
   const [createGroupOpen, setCreateGroupOpen] = useState<boolean>(false);
   const [rerender, setRerender] = useState<number>(0);
-  
+
   const notesEndRef = useRef<HTMLDivElement>(null);
+  const theme = useTheme();
 
   useEffect(() => {
     const getGroups = async () => {
@@ -47,10 +58,12 @@ const PrivateGroupComponent: React.FC = () => {
           return;
         }
 
-        const userGroups = await getSortedUserGroups(user.uid, GroupSortOption.MOST_RECENT_ACTIVITY_DESC);
+        const userGroups = await getSortedUserGroups(
+          user.uid,
+          GroupSortOption.MOST_RECENT_ACTIVITY_DESC
+        );
         setGroups(userGroups);
-        if(userGroups.length > 0)
-          handleGroupClick(userGroups[0])
+        if (userGroups.length > 0) handleGroupClick(userGroups[0]);
       } catch (err) {
         console.error("Feil ved innhenting av grupper", err);
         setError(err instanceof Error ? err.message : "Kunne ikke hente brukerens grupper");
@@ -62,8 +75,7 @@ const PrivateGroupComponent: React.FC = () => {
     getGroups();
   }, [rerender]);
 
-  if(!auth.currentUser)
-    return
+  if (!auth.currentUser) return;
 
   const handleGroupClick = async (group: Group) => {
     if (!group.id) {
@@ -77,9 +89,12 @@ const PrivateGroupComponent: React.FC = () => {
     try {
       const notes = await getGroupNotes(group.id);
 
-      const enrichedNotes = await Promise.all(
-        notes.map(async (note) => {
-          const sharedNote = group.shared_notes?.find((sn) => sn.note_id === note.id);
+      let enrichedNotes = await Promise.all(
+        group.shared_notes.map(async (sharedNote) => {
+          const note = notes.find((note) => note.id === sharedNote.note_id);
+          if (!note) {
+            return;
+          }
 
           let sharedByFullName = "Ukjent";
           if (sharedNote?.shared_by) {
@@ -101,20 +116,32 @@ const PrivateGroupComponent: React.FC = () => {
               })
             : "Ukjent dato";
 
+          // return {
+          //   ...note,
+          //   share_by_user_id: sharedNote?.shared_by || "",
+          //   shared_by: sharedByFullName,
+          //   shared_date: formattedDate,
+          // };
           return {
-            ...note,
-            share_by_user_id: sharedNote?.shared_by || "",
-            shared_by: sharedByFullName,
-            shared_date: formattedDate,
-          };
+            note_data: note,
+            shared_metadata: {
+              shared_by_id: sharedNote?.shared_by,
+              shared_by_name: sharedByFullName,
+              date: formattedDate,
+            },
+          } as SharedNoteWithNoteData;
         })
       );
 
+      enrichedNotes = enrichedNotes.filter((n) => n !== undefined);
+
       enrichedNotes.sort((a, b) => {
-        const dateA = new Date(a.shared_date).getTime();
-        const dateB = new Date(b.shared_date).getTime();
+        const dateA = new Date(a.shared_metadata.date).getTime();
+        const dateB = new Date(b.shared_metadata.date).getTime();
         return dateA - dateB;
       });
+
+      console.log(enrichedNotes);
 
       setGroupNotes(enrichedNotes);
     } catch (error) {
@@ -141,30 +168,29 @@ const PrivateGroupComponent: React.FC = () => {
           display: "flex",
           flexDirection: "column",
           minHeight: "100%",
+          bgcolor: theme.palette.background.paper,
         }}>
-        <Toolbar disableGutters sx={{ pl: 2 }}>
-          <Typography variant="h6">
-            Mine grupper
-          </Typography>
+        <Toolbar disableGutters sx={{ pl: 2, bgcolor: theme.palette.background.paper }}>
+          <Typography variant="h6">Mine grupper</Typography>
         </Toolbar>
 
         <Divider />
 
         <Button
-            variant="contained"
-            size="small"
-            onClick={() => setCreateGroupOpen(true)}
-            sx={{ width: "100%", height: "48px", p: 0, boxShadow: 0, borderRadius: 0}}
-          >
-            <AddIcon fontSize="small" />
+          variant="contained"
+          size="small"
+          color="primary"
+          onClick={() => setCreateGroupOpen(true)}
+          sx={{ width: "100%", height: "48px", p: 0, boxShadow: 0, borderRadius: 0 }}>
+          <AddIcon fontSize="small" />
           <Typography
-          sx={{
-            marginLeft: 1,
-            textTransform: "none"
-          }}
-          >Opprett Gruppe</Typography>
+            sx={{
+              marginLeft: 1,
+              textTransform: "none",
+            }}>
+            Opprett Gruppe
+          </Typography>
         </Button>
-
 
         {isLoading ? (
           <Box
@@ -190,16 +216,18 @@ const PrivateGroupComponent: React.FC = () => {
                   <ListItemButton
                     onClick={() => handleGroupClick(group)}
                     sx={{
-                      // backgroundColor:
-                      //   selectedGroup?.id === group.id ? "rgba(63, 81, 181, 0.2)" : "transparent",
-                      // "&:hover": {
-                      //   backgroundColor: "rgba(63, 81, 181, 0.1)",
-                      // },
+                      bgcolor:
+                        selectedGroup?.id === group.id
+                          ? theme.palette.background.default
+                          : theme.palette.background.paper,
+                      "&:hover": {
+                        backgroundColor: theme.palette.background.default,
+                      },
                       height: 48,
-                      display: "flex"
+                      display: "flex",
                     }}>
-                      <GroupAvatar group={group} size={30}/><ListItemText sx={{marginLeft: 2}} primary={truncateString(group.name, 13)} />
-                    
+                    <GroupAvatar group={group} size={30} />
+                    <ListItemText sx={{ marginLeft: 2 }} primary={truncateString(group.name, 13)} />
                   </ListItemButton>
                 </ListItem>
                 <Divider />
@@ -207,9 +235,8 @@ const PrivateGroupComponent: React.FC = () => {
             ))}
           </List>
         )}
-
       </Box>
-   
+
       <Divider orientation="vertical" flexItem />
       <Box
         sx={{
@@ -220,7 +247,13 @@ const PrivateGroupComponent: React.FC = () => {
         }}>
         {selectedGroup && (
           <Box sx={{ maxHeight: "92.5vh", overflowY: "auto" }}>
-            <Box sx={{ position: "sticky", top: "0", zIndex: 1000 }}>
+            <Box
+              sx={{
+                position: "sticky",
+                top: "0",
+                bgcolor: theme.palette.background.paper,
+                zIndex: 100,
+              }}>
               <Toolbar disableGutters sx={{ pl: 2 }}>
                 <Typography variant="h6">{selectedGroup.name}</Typography>
               </Toolbar>
@@ -244,13 +277,13 @@ const PrivateGroupComponent: React.FC = () => {
             ) : (
               <Grid container spacing={2} sx={{ padding: 2, flexDirection: "column" }}>
                 {groupNotes.map((note, index) => {
-                  const isCurrentUser = note.share_by_user_id === auth.currentUser?.uid;
+                  const isCurrentUser = note.shared_metadata.shared_by_id === auth.currentUser?.uid;
 
                   return (
                     <Grid
                       item
                       xs={12}
-                      key={`${note.id}-${index}`}
+                      key={`${note.note_data.id}-${index}`}
                       sx={{
                         display: "flex",
                         justifyContent: isCurrentUser ? "flex-end" : "flex-start",
@@ -263,15 +296,11 @@ const PrivateGroupComponent: React.FC = () => {
                           borderRadius: 2,
                         }}>
                         <Typography variant="caption" sx={{ color: "gray", display: "block" }}>
-                          Delt av {note.shared_by} den {note.shared_date}
+                          Delt av {note.shared_metadata.shared_by_name} den{" "}
+                          {note.shared_metadata.date}
                         </Typography>
                         <Box sx={{ marginTop: 1 }}>
-                          <NoteCard
-                            note={note}
-                            onDelete={(noteId: string) =>
-                              console.log(`Delete note with id: ${noteId}`)
-                            }
-                          />
+                          <NoteCard note={note.note_data} />
                         </Box>
                       </Box>
                     </Grid>
@@ -283,10 +312,16 @@ const PrivateGroupComponent: React.FC = () => {
           </Box>
         )}
       </Box>
-      {createGroupOpen ? <CreateGroupPopup open={createGroupOpen} onClose={() => {
-        setCreateGroupOpen(false)
-        setRerender(rerender+1);
-        }} user_id={auth.currentUser.uid}/> : null}
+      {createGroupOpen ? (
+        <CreateGroupPopup
+          open={createGroupOpen}
+          onClose={() => {
+            setCreateGroupOpen(false);
+            setRerender(rerender + 1);
+          }}
+          user_id={auth.currentUser.uid}
+        />
+      ) : null}
     </Box>
   );
 };

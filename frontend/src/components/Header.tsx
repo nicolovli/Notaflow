@@ -4,9 +4,8 @@ import { useState, useEffect } from "react";
 import { AuthLogout } from "./logout";
 import Button from "@mui/material/Button";
 import { useAuth } from "../firebase/func/useAuth";
-import { ThemeToggle } from './ThemeToggle';
+import { ThemeToggle } from "./ThemeToggle";
 import { Box } from "@mui/material";
-
 
 const Dropdown = ({
   isOpen,
@@ -52,11 +51,15 @@ export const Header = () => {
   }, [isLoggedIn]);
 
   return (
-    <div className="relative border-b-[1.5px] h-17 border-b-gray-100 bg-[#19262d] flex items-center justify-between px-4">
-      <div className="left-20 relative text-4xl text-white cursor-pointer" onClick={() => navigate("/Dashboard")}>
+    <div
+      className="relative border-b-[1.5px] h-17 border-b-gray-100 bg-[#19262d] flex items-center justify-between px-4"
+      style={{ zIndex: 100000 }}>
+      <div
+        className="left-20 relative text-4xl text-white cursor-pointer"
+        onClick={() => navigate("/Dashboard")}>
         NOTAFLOW
       </div>
-      
+
       {/* Right side elements */}
       <div className="flex items-center gap-4 sticky right-10">
         {/* Dark/light mode switch */}
@@ -74,21 +77,22 @@ export const Header = () => {
           </Button>
         ) : (
           // Postbutton and user icon
-          <div className="flex items-center gap-6">
-            {/* <button
+          <Box sx={{ zIndex: 10000 }}>
+            <Box className="flex items-center gap-6">
+              {/* <button
               className="h-10 w-10 border-2 border-black text-black bg-transparent text-3xl rounded-lg flex items-center justify-center hover:bg-indigo-900 transition cursor-pointer"
               onClick={() => navigate("/PublishingPage")}>
               +
             </button> */}
-            <div
-              onMouseEnter={() => setIsOpen(true)}
-              onMouseLeave={() => setIsOpen(false)}
-              style={{ zIndex: 1000 }}
-              className="relative">
-              <img src={Icon} alt="user icon" className="h-12 w-12 cursor-pointer" />
-              <Dropdown isOpen={isOpen} navigate={navigate} onLogout={handleLogout} />
-            </div>
-          </div>
+              <Box
+                onMouseEnter={() => setIsOpen(true)}
+                onMouseLeave={() => setIsOpen(false)}
+                className="relative">
+                <img src={Icon} alt="user icon" className="h-12 w-12 cursor-pointer" />
+                <Dropdown isOpen={isOpen} navigate={navigate} onLogout={handleLogout} />
+              </Box>
+            </Box>
+          </Box>
         )}
       </div>
     </div>

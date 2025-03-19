@@ -36,13 +36,12 @@ export const App = () => {
       <div
         style={{
           display: "grid",
-        gridTemplateRows: "auto 1fr", // header = auto, main content fills the rest
+          gridTemplateRows: "auto 1fr", // header = auto, main content fills the rest
           minHeight: "100vh",
-        }}
-      >
+        }}>
         {showFloatingButton && <FloatingPlusButton />}
         <Header />
-        <div style={{ display: "flex" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "auto 1fr" }}>
           <NavigationDrawer />
           <div style={{ flexGrow: 1, overflow: "auto" }}>
             <Routes>
@@ -62,7 +61,7 @@ export const App = () => {
                 <Route path="/createCourse/:id" element={<CreateCoursePage />} />
                 <Route path="/createCategory" element={<CreateCategoryPage />} />
                 <Route path="/privateGroupPage" element={<PrivateGroupsPage />} />
-            </Route>
+              </Route>
             </Routes>
           </div>
         </div>

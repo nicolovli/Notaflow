@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 
 const PrivateGroupsPage: React.FC = () => {
   return (
-    <Box sx={{ display: "flex", minHeight: "100%" }}>
+    <Box sx={{ display: "flex", minHeight: "100%", zIndex: 10 }}>
       <PrivateGroupComponent />
     </Box>
   );
