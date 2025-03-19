@@ -134,7 +134,6 @@ const CreateCourse = () => {
         alignItems: "center",
         minHeight: "100vh",
       }}>
-
       <Paper
         elevation={3}
         sx={{
@@ -152,7 +151,7 @@ const CreateCourse = () => {
           style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
           <div>
             <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-              Kursnavn
+              Fagnavn
             </Typography>
             <TextField
               type="text"
@@ -167,7 +166,7 @@ const CreateCourse = () => {
 
           <div>
             <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-              Kurskode
+              Fagkode
             </Typography>
             <TextField
               type="text"
@@ -201,8 +200,7 @@ const CreateCourse = () => {
             onClick={onSubmit}
             disabled={loading}
             variant="contained"
-            sx={{ mt: 2 }}
-          >
+            sx={{ mt: 2 }}>
             {loading ? "Lagrer..." : courseId ? "Oppdater fag" : "Opprett fag"}
           </Button>
         </form>
