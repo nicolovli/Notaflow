@@ -172,11 +172,16 @@ export const CourseDetailPage: React.FC = () => {
               ) : null}
               <Grid container spacing={3}>
                 {filteredNotes.map((note) => (
-                  <Grid item 
-                      xs={12}  // 1 card per row
-                      key={note.id}>
-                    <NoteCard note={note} />
+                  <Grid
+                    item
+                    xs={12} // 1 card per row on extra-small screens
+                    sm={6} // 2 cards per row on small screens
+                    md={4} // 3 cards per row on medium+ screens and there will never be more than 3 cards per page
+                    lg={4}
+                    key={course.id}>
+                    <NoteCard note={note}/>
                   </Grid>
+                  
                 ))}
               </Grid>
             </Box>
