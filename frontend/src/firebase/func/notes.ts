@@ -162,14 +162,20 @@ export const updateNote = async (
   input: Partial<CreateNoteInput>
 ): Promise<void> => {
   try {
+    console.log(input)
     const noteRef = doc(db, "notes", note_id);
     const updatedData: Partial<Omit<Note, "id">> = {};
 
-    if (input.subject_id !== undefined) updatedData.subject_id = input.subject_id;
-
-    if (input.title !== undefined) updatedData.title = input.title;
-
-    if (input.content !== undefined) updatedData.content = input.content;
+    if (input.subject_id !== undefined) 
+      updatedData.subject_id = input.subject_id;
+    if (input.title !== undefined) 
+      updatedData.title = input.title;
+    if (input.content !== undefined) 
+      updatedData.content = input.content;
+    if (input.theme !== undefined) 
+      updatedData.theme = input.theme;
+    if (input.tag !== undefined) 
+      updatedData.tag = input.tag;
 
     if (input.access_policy !== undefined) {
       const accessPolicyData: NoteAccessPolicy = {
@@ -221,8 +227,6 @@ export const giveGroupAccessToNote = async (note_id: string, group_id: string): 
       content: note.content,
       access_policy: stringToAccessPolicyType(note.access_policy.type),
       allowed_groups: note.access_policy.allowed_groups,
-      tag: [],
-      theme: [],
     };
     await updateNote(note.id, noteInput);
   } catch (error) {
