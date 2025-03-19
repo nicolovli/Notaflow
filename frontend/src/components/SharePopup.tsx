@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Modal, Alert, Typography, IconButton } from "@mui/material";
+import { Box, Modal, Alert, Typography, IconButton, useTheme } from "@mui/material";
 import { Group } from "../firebase/interfaces/interface.groups";
 import { getUserGroups, shareNote } from "../firebase/func/groups";
 import { IosShare } from "@mui/icons-material";
@@ -18,6 +18,8 @@ const SharePopup: React.FC<SharePopupProps> = ({ open, onClose, user_id, note })
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [groups, setGroups] = useState<Group[]>([]);
+
+    const theme = useTheme();
 
   useEffect(() => {
     const getGroups = async () => {
@@ -62,7 +64,7 @@ const SharePopup: React.FC<SharePopupProps> = ({ open, onClose, user_id, note })
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          bgcolor: "#ffffff",
+          bgcolor: theme.palette.background.paper,
           p: 4,
           borderRadius: 2,
           boxShadow: "0px 4px 10px rgba(0,0,0,0.2)",
@@ -78,7 +80,7 @@ const SharePopup: React.FC<SharePopupProps> = ({ open, onClose, user_id, note })
             mb: 3,
             fontWeight: "bold",
             textAlign: "center",
-            borderBottom: "1px solid #eaeaea",
+            borderBottom: `1px solid ${theme.palette.divider}`, 
             paddingBottom: 2,
           }}>
           Del med gruppe
@@ -100,8 +102,8 @@ const SharePopup: React.FC<SharePopupProps> = ({ open, onClose, user_id, note })
                 cursor: "pointer",
                 border: "1px solid transparent",
                 "&:hover": {
-                  backgroundColor: "#e8f4fd",
-                  borderColor: "#2196f3",
+                  backgroundColor: theme.palette.action.hover,
+                  borderColor: theme.palette.primary.main,
                   transform: "translateY(-2px)",
                 },
               }}>
@@ -114,6 +116,7 @@ const SharePopup: React.FC<SharePopupProps> = ({ open, onClose, user_id, note })
                   fontWeight: "600",
                   fontSize: "1rem",
                   flex: 1,
+                    color: "black",
                 }}>
                 {truncateString(g.name, 18)}
               </Typography>
@@ -122,7 +125,7 @@ const SharePopup: React.FC<SharePopupProps> = ({ open, onClose, user_id, note })
                 sx={{
                   color: "primary.main",
                   "&:hover": {
-                    backgroundColor: "rgba(33, 150, 243, 0.1)",
+                    backgroundColor: theme.palette.action.hover,
                   },
                 }}>
                 <IosShare fontSize="medium" />

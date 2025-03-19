@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { createSubject, updateSubject, getSubject } from "../firebase/func/subject";
 import { CreateSubject } from "../firebase/interfaces/interface.subject";
-import { TextField, CircularProgress, Alert } from "@mui/material";
+import { TextField, CircularProgress, Alert, Paper, Typography, Button, Box } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { auth } from "../Config/firebase-config";
 import { getAdditionalUserData } from "../firebase/func/user";
@@ -127,45 +127,33 @@ const CreateCourse = () => {
   }
 
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        height: "100%",
-        backgroundColor: "#f8f8f8",
+        minHeight: "100vh",
       }}>
-      <div
-        style={{
+
+      <Paper
+        elevation={3}
+        sx={{
           width: "100%",
-          maxWidth: "600px",
-          padding: "20px",
-          backgroundColor: "white",
-          borderRadius: "10px",
-          boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+          maxWidth: 600,
+          p: 3,
+          borderRadius: 2,
         }}>
-        <h2
-          style={{
-            fontSize: "20px",
-            fontWeight: "bold",
-            marginBottom: "15px",
-            fontFamily: "sans-serif",
-          }}>
+        <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
           {courseId ? "Rediger fag" : "Opprett et nytt fag!"}
-        </h2>
+        </Typography>
+
         <form
           onSubmit={handleSubmit}
           style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
           <div>
-            <label
-              style={{
-                display: "block",
-                fontSize: "14px",
-                fontWeight: "500",
-                fontFamily: "sans-serif",
-              }}>
+            <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
               Kursnavn
-            </label>
+            </Typography>
             <TextField
               type="text"
               value={courseName}
@@ -178,15 +166,9 @@ const CreateCourse = () => {
           </div>
 
           <div>
-            <label
-              style={{
-                display: "block",
-                fontSize: "14px",
-                fontWeight: "500",
-                fontFamily: "sans-serif",
-              }}>
+            <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
               Kurskode
-            </label>
+            </Typography>
             <TextField
               type="text"
               value={courseCode}
@@ -199,15 +181,9 @@ const CreateCourse = () => {
           </div>
 
           <div>
-            <label
-              style={{
-                display: "block",
-                fontSize: "14px",
-                fontWeight: "500",
-                fontFamily: "sans-serif",
-              }}>
+            <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
               Beskrivelse
-            </label>
+            </Typography>
             <TextField
               multiline
               minRows={3}
@@ -220,24 +196,18 @@ const CreateCourse = () => {
             />
           </div>
 
-          <button
+          <Button
             type="submit"
             onClick={onSubmit}
             disabled={loading}
-            style={{
-              width: "100%",
-              padding: "10px",
-              backgroundColor: "#007BFF",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}>
-            {loading ? "Lagrer..." : courseId ? "Oppdater dag" : "Opprett fag"}
-          </button>
+            variant="contained"
+            sx={{ mt: 2 }}
+          >
+            {loading ? "Lagrer..." : courseId ? "Oppdater fag" : "Opprett fag"}
+          </Button>
         </form>
-      </div>
-    </div>
+      </Paper>
+    </Box>
   );
 };
 

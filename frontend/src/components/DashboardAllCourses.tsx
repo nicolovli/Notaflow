@@ -67,11 +67,10 @@ export const DashboardAllCourses: React.FC = () => {
         {/* Overskrift */}
         <Typography
           variant="h3"
-          color="#19262d"
           sx={{ fontWeight: "bold", mb: 1, textAlign: "center" }}>
           Tilgjengelige fag
         </Typography>
-        <Typography variant="h6" color="textSecondary" sx={{ mb: 4, textAlign: "center" }}>
+        <Typography variant="h6" sx={{ mb: 4, textAlign: "center" }}>
           Utforsk notater delt av engasjerte studenter på NTNU
         </Typography>
 
@@ -111,11 +110,10 @@ export const DashboardAllCourses: React.FC = () => {
         {/* Overskrift */}
         <Typography
           variant="h3"
-          color="#19262d"
           sx={{ fontWeight: "bold", mb: 1, textAlign: "center" }}>
           Tilgjengelige fag
         </Typography>
-        <Typography variant="h6" color="textSecondary" sx={{ mb: 4, textAlign: "center" }}>
+        <Typography variant="h6" sx={{ mb: 4, textAlign: "center" }}>
           Utforsk alle notater delt av engasjerte studenter på NTNU
         </Typography>
         <Box sx={{ mb: 5, textAlign: "center" }}>

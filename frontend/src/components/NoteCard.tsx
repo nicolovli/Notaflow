@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
+  Box,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import DialogActions from "@mui/material/DialogActions";
@@ -193,7 +194,7 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
             <Typography variant="h5" sx={{ fontWeight: "bold" }}>
               {note.title}
             </Typography>
-            <div className={containerClassName}>
+            <Box className={containerClassName}>
               {note.theme && Array.isArray(note.theme) && note.theme.length > 0
                 ? note.theme.map((theme, index) => (
                     <span
@@ -203,7 +204,7 @@ const NoteCard: React.FC<Props> = ({ note, onDelete }) => {
                     </span>
                   ))
                 : null}
-            </div>
+            </Box>
             <div className="flex items-center gap-1 !mt-1">
               <Typography
                 sx={{

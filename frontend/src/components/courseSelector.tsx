@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Subject } from "../firebase/interfaces/interface.subject";
 import { getAllSubjects } from "../firebase/func/subject";
-import { Alert, TextField } from "@mui/material";
+import { Alert, Paper, TextField } from "@mui/material";
 
 interface CourseSelectorProps {
   onSubjectSelect: (subject: Subject | null) => void;
@@ -106,13 +106,12 @@ const CourseSelector: React.FC<CourseSelectorProps> = ({
       )}
 
       {!isLoading && isOpen && (
-        <div
+        <Paper
           ref={dropdownRef}
           style={{
             position: "absolute",
             zIndex: 10,
             width: "100%",
-            backgroundColor: "white",
             borderRadius: "5px",
             boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
             maxHeight: "300px",
@@ -122,7 +121,7 @@ const CourseSelector: React.FC<CourseSelectorProps> = ({
             textAlign: "center",
           }}>
           {filteredSubjects.length === 0 ? (
-            <div className="p-2 text-gray-500">No subjects found</div>
+            <div className="p-2">No subjects found</div>
           ) : (
             <ul>
               {filteredSubjects.map((subject) => (
@@ -135,12 +134,12 @@ const CourseSelector: React.FC<CourseSelectorProps> = ({
                     borderBottom: "1px solid #eee",
                   }}>
                   <span className="font-medium">{subject.subject_code}</span>
-                  <span className="ml-2 text-gray-600"> - {subject.name}</span>
+                  <span className="ml-2"> - {subject.name}</span>
                 </li>
               ))}
             </ul>
           )}
-        </div>
+        </Paper>
       )}
     </div>
   );

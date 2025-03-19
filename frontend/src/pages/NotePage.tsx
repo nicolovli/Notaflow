@@ -4,7 +4,6 @@ import { addComment, addNoteRating, getNote, hasUserRatedNote, incrementNoteView
 import { Note, NoteComment, NoteRating, AccessPolicyType, stringToAccessPolicyType, accessPolicyTypeToString } from "../firebase/interfaces/interface.notes";
 import { getSubject } from "../firebase/func/subject";
 import { Subject } from "../firebase/interfaces/interface.subject";
-import { CircularProgress, Alert, Tooltip, Typography, Chip, Rating, Box, TextField, Button, Card, CardContent } from "@mui/material";
 import { addFavorite, removeFavorite, isFavorite } from "../firebase/func/favorites";
 import { getAverageRating } from "../firebase/func/notes";
 import SharePopup from "../components/SharePopup";
@@ -16,7 +15,21 @@ import "../assets/style.css";
 import { auth } from "../Config/firebase-config";
 import { getAdditionalUserData } from "../firebase/func/user";
 import { BasicUserInfo } from "../firebase/interfaces/interface.userInfo";
-import Divider from '@mui/material/Divider';
+import {
+  CircularProgress,
+  Alert,
+  Tooltip,
+  Typography,
+  Chip,
+  Rating,
+  Box,
+  TextField,
+  Button,
+  Card,
+  CardContent,
+  Divider,
+  Paper,
+} from "@mui/material";
 import { isUserMemberOfOneGroup } from "../firebase/func/groups";
 
 export const NotePage: React.FC = () => {
@@ -172,16 +185,23 @@ export const NotePage: React.FC = () => {
       </Alert>
     );
   } else {
+    
+    
     return (
-    <div className="relative flex justify-start items-center place-items-center flex-col">
-           {/* Everything on right side */}
-      <div className="flex flex-col gap-4 mt-6 mb-4 relative max-w-3xl w-full p-20 h-full font-sans top-2" 
+      <Box 
+      className="relative flex justify-start items-center place-items-center flex-col">
+           
+        {/* Everything on right side */}
+        <Box className="flex flex-col gap-4 mt-6 mb-4 relative max-w-3xl w-full p-20 h-full font-sans top-2" 
         style={{
           paddingBottom: 20,
-          marginBottom: 20
+          marginBottom: 20,
+          marginTop: 15
+
         }}
         >
-        <div className="flex items-center justify-center gap-4 0">
+        <Box className="flex items-center justify-center gap-4 0">
+        
         {/* Favorites */}
         {uid ? (
             <Tooltip title={isNoteFavorite ? "Remove from favorites" : "Add to favorites"}>
@@ -208,6 +228,8 @@ export const NotePage: React.FC = () => {
             </Tooltip>
           ): null
         }
+
+
         {/* note rating*/}
         {stringToAccessPolicyType(note.access_policy.type) == AccessPolicyType.PUBLIC ? (
         <Chip
@@ -303,7 +325,7 @@ export const NotePage: React.FC = () => {
            />
          </Tooltip>
         ) : null}
-        </div>
+    </Box>
 
         {/* Share popup */}
         {uid? (
@@ -311,35 +333,40 @@ export const NotePage: React.FC = () => {
         ) : null}
     
 
-        {/* RatingPopup */}
-        <RatingPopup open={ratingOpen} onClose={() => setRatingOpen(false)} onSave={handleSaveRating} noteTitle={note.title} />
-      
-      </div>
-        <div
+    {/* RatingPopup */}
+    <RatingPopup open={ratingOpen} onClose={() => setRatingOpen(false)} onSave={handleSaveRating} noteTitle={note.title} />
+    </Box>
+
+      <Paper
+        style={{
+          marginLeft: 20,
+          marginRight: 20,
+          marginBottom: 20,
+          boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px",
+          borderRadius: 20
+        }}
+       className="relative max-w-3xl w-full p-20 h-full font-sans bg-white overflow-hidden">
+        <div 
+        style={{
+          padding: 30,
+          minHeight: 'calc(100vh - 200px)'
+        }}
+        className="p-10 w-full h-full">
+        
+        <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
+          {note.title}
+        </Typography>
+        
+        <Typography 
           style={{
-            marginLeft: 20,
-            marginRight: 20,
-            marginBottom: 20,
-            boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px",
-            borderRadius: 20
+            paddingBottom: 20,
+            marginBottom: 20
           }}
-          className="relative max-w-3xl w-full p-20 h-full font-sans bg-white overflow-hidden">
-          <div
-            style={{
-              padding: 30,
-              minHeight: 'calc(100vh - 200px)'
-            }}
-            className="p-10 w-full h-full">
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">{note.title}</h1>
-              <p
-                style={{
-                  marginBottom: 5
-                }}
-                className="text-lg text-gray-700 font-medium">
-                {subject.name} ({subject.subject_code})
-              </p>
-              <div className={'flex justify-start  border-b-gray-200 border-b !pb-5 !pt-2'}>
+          className="text-lg font-medium border-b-gray-200 border-b mb-4">
+          {subject.name} ({subject.subject_code})
+        </Typography>
+
+        <Box className={'flex justify-start  border-b-gray-200 border-b !pb-5 !pt-2'}>
                 {note.theme && Array.isArray(note.theme) && note.theme.length > 0 ? (
                   note.theme.map((theme, index) => (
                     <span
@@ -350,15 +377,16 @@ export const NotePage: React.FC = () => {
                     </span>
                   ))
                 ) : null}
-              </div>
-            </div>
-            <div
+            </Box>
+          <Box
               id="content"
-              className="prose prose-lg text-gray-800 leading-relaxed mt-6"
+              className="prose prose-lgleading-relaxed mt-6"
+              marginTop={2}
               dangerouslySetInnerHTML={{ __html: note.content }}
-            />
-          </div>
+            >
+          </Box>
         </div>
+      </Paper>
 
         {/* <div
           style={{
@@ -369,24 +397,27 @@ export const NotePage: React.FC = () => {
             borderRadius: 20
           }}
           className="relative max-w-3xl w-full p-20 h-full font-sans bg-white overflow-hidden"> */}
+          
           {/* Comments */}
           {stringToAccessPolicyType(note.access_policy.type) === AccessPolicyType.PUBLIC ? (
-            <div
-            style={{
-              marginLeft: 20,
-              marginRight: 20,
-              marginBottom: 20,
-              boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px",
-              borderRadius: 20
+            <Paper
+              style={{
+                marginLeft: 20,
+                marginRight: 20,
+                marginBottom: 20,
+                boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px",
+                borderRadius: 20
             }}
-          className="relative max-w-3xl w-full p-20 h-full font-sans bg-white overflow-hidden">
-          <Card className="w-full shadow-lg rounded-2xl border border-gray-200">
+            className="relative max-w-3xl w-full p-20 h-full font-sans overflow-hidden">
+          <Card className="w-full shadow-lg rounded-2xl">
             <CardContent className="p-6 space-y-4">
+              
               {/* Tittel */}
-              <Typography variant="h5" className="text-gray-900 font-semibold">
+              <Typography variant="h5" className= "font-semibold">
                 Kommenter notat
               </Typography>
               <Divider />
+
               {/* Input-felt */}
               <TextField
                 fullWidth
@@ -408,6 +439,7 @@ export const NotePage: React.FC = () => {
               Kommenter notat
             </Typography>
             <Divider/> */}
+
               {/* Publiser-knapp */}
               <div className="flex justify-end">
                 <Button
@@ -456,14 +488,14 @@ export const NotePage: React.FC = () => {
                 );
               })
             ) : (
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2">
                 Ingen kommentarer ennå.
               </Typography>
             )}
           </CardContent>
-        </div>
+        </Paper>
       ): null}
-    </div>
+    </Box>
     )};
 }
 
