@@ -218,7 +218,7 @@ const PrivateGroupComponent: React.FC = () => {
                     sx={{
                       bgcolor:
                         selectedGroup?.id === group.id
-                          ? theme.palette.background.default
+                          ? "rgba(63, 81, 181, 0.2)"
                           : theme.palette.background.paper,
                       "&:hover": {
                         backgroundColor: theme.palette.background.default,
