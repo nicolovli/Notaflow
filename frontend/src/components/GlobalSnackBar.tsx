@@ -32,7 +32,7 @@ const GlobalSnackbar = () => {
   return (
     <Snackbar
       open={snackbarOpen}
-      autoHideDuration={400000000}
+      autoHideDuration={4000}
       onClose={() => setSnackbarOpen(false)}
       message={<span style={{ width: "100%", textAlign: "center" }}>{snackbarMessage}</span>}
       anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
